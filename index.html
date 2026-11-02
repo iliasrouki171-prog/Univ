@@ -17,7 +17,7 @@
       d.onclick = function () { d.remove(); };
       document.body.appendChild(d);
     }
-    d.textContent = msg + "  [v8 - اضغط لإغلاق]";
+    d.textContent = msg + "  [v9 - اضغط لإغلاق]";
   }
   window.addEventListener("error", function (e) { showDiag("Error: " + (e.message || "script") + " (" + (e.lineno || "?") + ")"); });
   window.addEventListener("unhandledrejection", function (e) { showDiag("Promise: " + ((e.reason && e.reason.message) || e.reason)); });
@@ -183,6 +183,9 @@
   button.rx.mine { background: rgba(255,92,147,.38); border-color: #ff8fb8; }
   .tick { font-size: 12px; letter-spacing: -3px; cursor: pointer; padding: 0 2px; }
   .tick.read { color: #4dabf7; }
+  .msg .meta .act { background: none; padding: 0 4px; font-size: 13px; color: var(--muted); border-radius: 8px; }
+  .msg .meta .act-react { font-size: 16px; }
+  .msg .meta .act:active { background: rgba(255,255,255,.15); }
   #replyBar {
     display: flex; align-items: center; gap: 10px; padding: 8px 14px;
     background: var(--bar); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
@@ -323,7 +326,7 @@
 </div>
 
 <header>
-  <div class="title"><span id="dot" title="حالة الاتصال"></span> 💞 محادثتنا <small style="opacity:.6;font-size:10px;font-weight:400">v8</small></div>
+  <div class="title"><span id="dot" title="حالة الاتصال"></span> 💞 محادثتنا <small style="opacity:.6;font-size:10px;font-weight:400">v9</small></div>
   <div class="right">
     <span id="who"></span>
     <button class="icon-btn" id="soundBtn" title="الصوت">🔔</button>
@@ -923,6 +926,13 @@
 
     const meta = document.createElement("div");
     meta.className = "meta";
+    const bReact = document.createElement("button");
+    bReact.type = "button"; bReact.className = "act act-react"; bReact.textContent = "😊"; bReact.title = "تفاعل";
+    bReact.onclick = () => openSheet(key);
+    const bReply = document.createElement("button");
+    bReply.type = "button"; bReply.className = "act act-reply"; bReply.textContent = "↩ رد"; bReply.title = "رد على الرسالة";
+    bReply.onclick = () => setReply(key);
+    meta.appendChild(bReact); meta.appendChild(bReply);
     if (mine) {
       const del = document.createElement("button");
       del.className = "del"; del.textContent = "🗑 حذف";
