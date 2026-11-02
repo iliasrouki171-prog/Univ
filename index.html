@@ -17,7 +17,7 @@
       d.onclick = function () { d.remove(); };
       document.body.appendChild(d);
     }
-    d.textContent = msg + "  [v6 - اضغط لإغلاق]";
+    d.textContent = msg + "  [v7 - اضغط لإغلاق]";
   }
   window.addEventListener("error", function (e) { showDiag("Error: " + (e.message || "script") + " (" + (e.lineno || "?") + ")"); });
   window.addEventListener("unhandledrejection", function (e) { showDiag("Promise: " + ((e.reason && e.reason.message) || e.reason)); });
@@ -116,8 +116,6 @@
     position: fixed; inset: 0; background: #000; display: flex; flex-direction: column;
     align-items: center; justify-content: center; gap: 14px; padding: 24px; color: #fff; z-index: 50;
   }
-  #login .lh { font-size: 46px; color: #ff5c93; text-shadow: 0 0 24px rgba(255,92,147,.8); animation: beat 1.6s ease-in-out infinite; }
-  @keyframes beat { 0%,100% { transform: scale(1); } 15% { transform: scale(1.18); } 30% { transform: scale(1); } 45% { transform: scale(1.12); } }
   #login h1 { font-size: 24px; font-weight: 600; }
   #login .sub { color: #8d8d8d; font-size: 14px; margin-top: -6px; }
   #login input {
@@ -125,9 +123,9 @@
     border-radius: 12px; text-align: center; outline: none; font-family: inherit;
     background: #0d0d0d; color: #fff;
   }
-  #login input:focus { border-color: #ff5c93; box-shadow: 0 0 0 3px rgba(255,92,147,.18); }
-  #login button { width: 100%; max-width: 320px; padding: 13px 0; font-weight: 600; border-radius: 12px; }
-  #login .link { background: none; color: #8d8d8d; font-size: 13px; padding: 0; width: auto; }
+  #login input:focus { border-color: #fff; box-shadow: 0 0 0 3px rgba(255,255,255,.12); }
+  #login button { width: 100%; max-width: 320px; padding: 13px 0; font-weight: 600; border-radius: 12px; background: #fff; color: #000; }
+  #login button.link { background: none; color: #8d8d8d; font-size: 13px; padding: 0; width: auto; }
   #loginErr { color: #ff6b6b; min-height: 20px; font-size: 14px; }
   .shake { animation: shake .35s; }
   @keyframes shake { 20%,60% { transform: translateX(-8px); } 40%,80% { transform: translateX(8px); } }
@@ -270,7 +268,6 @@
 </div>
 
 <div id="login">
-  <div class="lh">❤</div>
   <h1>تسجيل الدخول</h1>
   <p class="sub">اكتب اسم المستخدم والكود</p>
   <input id="userInput" type="text" placeholder="اسم المستخدم" maxlength="20" autocomplete="off" autocapitalize="off">
@@ -281,7 +278,7 @@
 </div>
 
 <header>
-  <div class="title"><span id="dot" title="حالة الاتصال"></span> 💞 محادثتنا <small style="opacity:.6;font-size:10px;font-weight:400">v6</small></div>
+  <div class="title"><span id="dot" title="حالة الاتصال"></span> 💞 محادثتنا <small style="opacity:.6;font-size:10px;font-weight:400">v7</small></div>
   <div class="right">
     <span id="who"></span>
     <button class="icon-btn" id="soundBtn" title="الصوت">🔔</button>
