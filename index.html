@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl" data-theme="light">
+<html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#0b7285">
+<meta name="theme-color" content="#1a0618">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <title>دردشة</title>
@@ -17,7 +17,7 @@
       d.onclick = function () { d.remove(); };
       document.body.appendChild(d);
     }
-    d.textContent = msg + "  [v5 - اضغط لإغلاق]";
+    d.textContent = msg + "  [v6 - اضغط لإغلاق]";
   }
   window.addEventListener("error", function (e) { showDiag("Error: " + (e.message || "script") + " (" + (e.lineno || "?") + ")"); });
   window.addEventListener("unhandledrejection", function (e) { showDiag("Promise: " + ((e.reason && e.reason.message) || e.reason)); });
@@ -27,45 +27,32 @@
 </script>
 <style>
   :root {
-    --bg: #e9edef; --header: #0b7285; --bubble: rgba(255,255,255,.80); --bubble-me: rgba(200,238,244,.88);
-    --text: #111; --muted: #667; --accent: #0b7285; --bar: rgba(244,246,250,.72); --input: rgba(255,255,255,.92);
-    --chip: rgba(0,0,0,.08);
-    --wall:
-      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140' viewBox='0 0 140 140'%3E%3Cg fill='none' stroke='%230b7285' stroke-opacity='.13' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='24' cy='26' r='8'/%3E%3Cpath d='M92 18v14M85 25h14'/%3E%3Cpath d='M112 74l4 9 9 1-7 6 2 9-8-5-8 5 2-9-7-6 9-1z'/%3E%3Cpath d='M20 84q8-10 16 0t16 0'/%3E%3Cpath d='M70 108l8 8-8 8-8-8z'/%3E%3Cpath d='M58 52a6 6 0 1 0 0 .1'/%3E%3C/g%3E%3C/svg%3E") 0 0 / 140px 140px,
-      radial-gradient(circle at 15% 10%, rgba(11,114,133,.18), transparent 45%),
-      radial-gradient(circle at 90% 85%, rgba(190,75,219,.14), transparent 45%),
-      linear-gradient(160deg, #e3f6f9, #eaeefb 55%, #f8ebf6);
-  }
-  [data-theme="dark"] {
-    --bg: #0f1a1f; --header: #134e5a; --bubble: rgba(30,44,56,.72); --bubble-me: rgba(14,86,102,.78);
-    --text: #e8eef0; --muted: #a3b1b8; --accent: #6fd3e3; --bar: rgba(16,28,36,.7); --input: rgba(34,50,60,.9);
-    --chip: rgba(255,255,255,.1);
-    --wall:
-      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140' viewBox='0 0 140 140'%3E%3Cg fill='none' stroke='%23ffffff' stroke-opacity='.07' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='24' cy='26' r='8'/%3E%3Cpath d='M92 18v14M85 25h14'/%3E%3Cpath d='M112 74l4 9 9 1-7 6 2 9-8-5-8 5 2-9-7-6 9-1z'/%3E%3Cpath d='M20 84q8-10 16 0t16 0'/%3E%3Cpath d='M70 108l8 8-8 8-8-8z'/%3E%3Cpath d='M58 52a6 6 0 1 0 0 .1'/%3E%3C/g%3E%3C/svg%3E") 0 0 / 140px 140px,
-      radial-gradient(circle at 15% 10%, rgba(32,201,151,.16), transparent 45%),
-      radial-gradient(circle at 90% 85%, rgba(132,94,247,.2), transparent 50%),
-      linear-gradient(160deg, #0a171c, #11262f 55%, #181a30);
+    --bg: #07030a; --header: #8a1750; --bubble: rgba(40,16,36,.72);
+    --bubble-me: linear-gradient(135deg, rgba(255,92,147,.55), rgba(194,37,92,.5));
+    --text: #fdeef5; --muted: #c9a3b8; --accent: #ff8fb8; --bar: rgba(20,6,20,.72);
+    --input: rgba(64,24,56,.85); --chip: rgba(255,255,255,.1);
   }
   * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
   html, body { height: 100%; }
   body {
     font-family: system-ui, -apple-system, "Segoe UI", Tahoma, sans-serif;
-    background: var(--wall); background-attachment: fixed; background-color: var(--bg);
-    color: var(--text);
+    background: var(--bg); color: var(--text);
     display: flex; flex-direction: column; height: 100dvh;
   }
   header {
-    background: var(--header); color: #fff; padding: 12px 16px;
-    padding-top: calc(12px + env(safe-area-inset-top));
+    background: linear-gradient(120deg, rgba(138,23,80,.88), rgba(86,20,110,.88));
+    backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+    color: #fff; padding: 12px 16px; padding-top: calc(12px + env(safe-area-inset-top));
     display: flex; justify-content: space-between; align-items: center; gap: 8px;
+    border-bottom: 1px solid rgba(255,255,255,.12);
   }
   header .title { font-size: 18px; font-weight: 600; display: flex; align-items: center; gap: 8px; }
   #dot { width: 10px; height: 10px; border-radius: 50%; background: #e67700; transition: background .3s; }
-  #dot.on { background: #51cf66; }
-  header .right { display: flex; align-items: center; gap: 10px; font-size: 13px; }
+  #dot.on { background: #51cf66; box-shadow: 0 0 8px #51cf66; }
+  header .right { display: flex; align-items: center; gap: 8px; font-size: 13px; }
   header .icon-btn {
-    background: rgba(255,255,255,.18); border-radius: 50%; width: 34px; height: 34px;
-    padding: 0; font-size: 16px; display: flex; align-items: center; justify-content: center;
+    background: rgba(255,255,255,.16); border-radius: 50%; width: 34px; height: 34px;
+    padding: 0; font-size: 15px; display: flex; align-items: center; justify-content: center;
   }
   #messages {
     flex: 1; overflow-y: auto; padding: 12px; display: flex; flex-direction: column; gap: 6px;
@@ -76,14 +63,14 @@
     font-size: 12px; padding: 3px 12px; border-radius: 12px; margin: 8px 0 4px;
   }
   .msg {
-    max-width: 80%; padding: 8px 12px; border-radius: 12px; background: var(--bubble);
+    max-width: 80%; padding: 8px 12px; border-radius: 14px; background: var(--bubble);
     align-self: flex-start; overflow-wrap: anywhere;
-    box-shadow: 0 2px 10px rgba(0,0,0,.10); animation: pop .15s ease-out;
+    box-shadow: 0 2px 12px rgba(0,0,0,.35); animation: pop .15s ease-out;
     backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
-    border: 1px solid rgba(255,255,255,.18);
+    border: 1px solid rgba(255,143,184,.18);
   }
   @keyframes pop { from { transform: scale(.96); opacity: 0; } to { transform: none; opacity: 1; } }
-  .msg.me { background: var(--bubble-me); align-self: flex-end; }
+  .msg.me { background: var(--bubble-me); align-self: flex-end; border-color: rgba(255,255,255,.22); }
   .msg .name { font-size: 12px; color: var(--accent); font-weight: 600; margin-bottom: 2px; }
   .msg .text { white-space: pre-wrap; font-size: 16px; line-height: 1.45; }
   .msg .text a { color: var(--accent); text-decoration: underline; }
@@ -95,43 +82,57 @@
   #empty { margin: auto; color: var(--muted); font-size: 15px; text-align: center; }
   #toBottom {
     position: fixed; left: 16px; bottom: 82px; width: 40px; height: 40px; border-radius: 50%;
-    background: var(--accent); color: #fff; font-size: 18px; padding: 0;
-    box-shadow: 0 2px 6px rgba(0,0,0,.3);
+    background: #d6336c; color: #fff; font-size: 18px; padding: 0;
+    box-shadow: 0 2px 10px rgba(214,51,108,.6);
   }
   #toBottom span {
-    position: absolute; top: -6px; right: -6px; background: #e03131; color: #fff;
+    position: absolute; top: -6px; right: -6px; background: #fff; color: #c2255c;
     font-size: 11px; min-width: 18px; height: 18px; border-radius: 9px; padding: 0 4px;
-    display: flex; align-items: center; justify-content: center;
+    display: flex; align-items: center; justify-content: center; font-weight: 700;
   }
   form {
     display: flex; gap: 8px; padding: 10px; align-items: flex-end;
     padding-bottom: calc(10px + env(safe-area-inset-bottom)); background: var(--bar);
+    backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+    border-top: 1px solid rgba(255,255,255,.08);
   }
   #input {
     flex: 1; padding: 11px 14px; font-size: 16px; border: none; border-radius: 20px;
     outline: none; font-family: inherit; background: var(--input); color: var(--text);
     resize: none; max-height: 120px; line-height: 1.4;
   }
+  #input::placeholder { color: #b98ca6; }
   button {
-    background: var(--header); color: #fff; border: none; border-radius: 22px;
+    background: linear-gradient(135deg, #d6336c, #9c2a8c); color: #fff; border: none; border-radius: 22px;
     padding: 0 20px; font-size: 16px; font-family: inherit; cursor: pointer;
   }
   button:active { opacity: .75; }
-  #send { height: 44px; }
-  #send:disabled { opacity: .45; }
-  #login {
-    position: fixed; inset: 0; background: #0b7285; display: flex; flex-direction: column;
-    align-items: center; justify-content: center; gap: 14px; padding: 24px; color: #fff; z-index: 10;
-  }
-  #login h1 { font-size: 26px; }
-  #login input {
-    width: 100%; max-width: 320px; padding: 14px; font-size: 17px; border: none;
-    border-radius: 12px; text-align: center; outline: none; font-family: inherit;
-  }
-  #login button { background: #fff; color: #0b7285; padding: 12px 40px; font-weight: 600; }
-  /* ===== الوسائط ===== */
+  #send { height: 44px; padding: 0 16px; }
   .round { width: 42px; height: 42px; padding: 0; font-size: 18px; border-radius: 50%; flex: none; }
-  #send { padding: 0 16px; }
+
+  /* ===== شاشة الدخول (سوداء) ===== */
+  body.locked > header, body.locked > #messages, body.locked > form { visibility: hidden; }
+  #login {
+    position: fixed; inset: 0; background: #000; display: flex; flex-direction: column;
+    align-items: center; justify-content: center; gap: 14px; padding: 24px; color: #fff; z-index: 50;
+  }
+  #login .lh { font-size: 46px; color: #ff5c93; text-shadow: 0 0 24px rgba(255,92,147,.8); animation: beat 1.6s ease-in-out infinite; }
+  @keyframes beat { 0%,100% { transform: scale(1); } 15% { transform: scale(1.18); } 30% { transform: scale(1); } 45% { transform: scale(1.12); } }
+  #login h1 { font-size: 24px; font-weight: 600; }
+  #login .sub { color: #8d8d8d; font-size: 14px; margin-top: -6px; }
+  #login input {
+    width: 100%; max-width: 320px; padding: 14px; font-size: 17px; border: 1px solid #2c2c2c;
+    border-radius: 12px; text-align: center; outline: none; font-family: inherit;
+    background: #0d0d0d; color: #fff;
+  }
+  #login input:focus { border-color: #ff5c93; box-shadow: 0 0 0 3px rgba(255,92,147,.18); }
+  #login button { width: 100%; max-width: 320px; padding: 13px 0; font-weight: 600; border-radius: 12px; }
+  #login .link { background: none; color: #8d8d8d; font-size: 13px; padding: 0; width: auto; }
+  #loginErr { color: #ff6b6b; min-height: 20px; font-size: 14px; }
+  .shake { animation: shake .35s; }
+  @keyframes shake { 20%,60% { transform: translateX(-8px); } 40%,80% { transform: translateX(8px); } }
+
+  /* ===== الوسائط ===== */
   .media { margin: 2px 0 4px; }
   .media.loading {
     display: flex; align-items: center; justify-content: center; min-height: 60px;
@@ -140,7 +141,7 @@
   .media.image, .media.video { width: min(240px, 60vw); }
   .media.audio { width: min(230px, 62vw); }
   .media img, .media video {
-    width: 100%; height: 100%; object-fit: cover; border-radius: 8px; display: block; background: rgba(0,0,0,.15);
+    width: 100%; height: 100%; object-fit: cover; border-radius: 8px; display: block; background: rgba(0,0,0,.25);
   }
   .media video { object-fit: contain; background: #000; }
   .media audio { width: 100%; height: 40px; display: block; }
@@ -149,117 +150,147 @@
     background: var(--bar); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
     border-top: 1px solid var(--chip);
   }
-  #recBar .rdot { width: 12px; height: 12px; border-radius: 50%; background: #e03131; animation: blink 1s infinite; }
+  #recBar .rdot { width: 12px; height: 12px; border-radius: 50%; background: #ff3b5c; animation: blink 1s infinite; }
   #recBar .grow { flex: 1; color: var(--muted); font-size: 14px; }
   #recTime { font-variant-numeric: tabular-nums; direction: ltr; }
   #recBar button { height: 38px; padding: 0 16px; font-size: 15px; }
-  #recCancel { background: #868e96; }
+  #recCancel { background: #6c5b68; }
   @keyframes blink { 50% { opacity: .25; } }
   #toast {
     position: fixed; left: 50%; bottom: 100px; transform: translateX(-50%);
-    background: rgba(0,0,0,.78); color: #fff; padding: 10px 18px; border-radius: 20px;
+    background: rgba(0,0,0,.8); color: #fff; padding: 10px 18px; border-radius: 20px;
     font-size: 14px; z-index: 20; max-width: 88vw; text-align: center;
   }
   #viewer {
-    position: fixed; inset: 0; background: rgba(0,0,0,.92); z-index: 30;
+    position: fixed; inset: 0; background: rgba(0,0,0,.93); z-index: 30;
     display: flex; align-items: center; justify-content: center;
   }
   #viewer img { max-width: 100%; max-height: 100%; object-fit: contain; }
 
-  /* ===== الخلفية المتحركة ===== */
+  /* ===== الخلفية الرومانسية المتحركة ===== */
   #bg { position: fixed; inset: 0; z-index: -1; overflow: hidden; pointer-events: none; }
+  body.locked #bg, body.locked #bg * { animation-play-state: paused !important; }
   #bg .flow {
     position: absolute; inset: 0;
-    background: linear-gradient(125deg, #bff3f6, #d9d3fb, #fbd0ea, #ffe6c4, #c8f5e3, #bff3f6);
-    background-size: 400% 400%; animation: flow 26s ease-in-out infinite;
-  }
-  [data-theme="dark"] #bg .flow {
-    background: linear-gradient(125deg, #050f17, #13214a, #2b1550, #0a3d46, #0d1b3a, #050f17);
-    background-size: 400% 400%;
+    background: linear-gradient(125deg, #05010a, #2a0a2e, #4a0d2e, #1a0630, #3a0a22, #05010a);
+    background-size: 400% 400%; animation: flow 30s ease-in-out infinite;
   }
   @keyframes flow { 0%,100% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } }
 
   #bg .orb {
-    position: absolute; border-radius: 50%; filter: blur(55px); opacity: .55;
-    animation: drift 20s ease-in-out infinite alternate; will-change: transform;
+    position: absolute; border-radius: 50%; filter: blur(60px); opacity: .38;
+    animation: drift 22s ease-in-out infinite alternate; will-change: transform;
   }
-  #bg .o1 { width: 300px; height: 300px; top: -80px; left: -60px; background: #38d9a9; }
-  #bg .o2 { width: 340px; height: 340px; top: 30%; right: -120px; background: #b197fc; animation-duration: 26s; animation-delay: -6s; }
-  #bg .o3 { width: 280px; height: 280px; bottom: -90px; left: 8%; background: #ff8fb8; animation-duration: 23s; animation-delay: -12s; }
-  #bg .o4 { width: 220px; height: 220px; top: 55%; left: 30%; background: #74c0fc; animation-duration: 30s; animation-delay: -3s; }
-  [data-theme="dark"] #bg .orb { opacity: .4; }
+  #bg .o1 { width: 300px; height: 300px; top: -80px; left: -60px; background: #ff3d81; }
+  #bg .o2 { width: 340px; height: 340px; top: 32%; right: -120px; background: #9c36ff; animation-duration: 28s; animation-delay: -6s; }
+  #bg .o3 { width: 280px; height: 280px; bottom: -90px; left: 6%; background: #ff1f4b; animation-duration: 25s; animation-delay: -12s; }
+  #bg .o4 { width: 220px; height: 220px; top: 56%; left: 32%; background: #ff6bd6; animation-duration: 32s; animation-delay: -3s; }
   @keyframes drift {
     0%   { transform: translate(0,0) scale(1); }
     50%  { transform: translate(50px,-70px) scale(1.18); }
     100% { transform: translate(-40px,60px) scale(.95); }
   }
 
+  #bg .moon {
+    position: absolute; top: 74px; right: 24px; width: 64px; height: 64px; border-radius: 50%;
+    background: radial-gradient(circle at 35% 35%, #fff7fb, #ffc1da 60%, #ff8fb8);
+    box-shadow: 0 0 36px 10px rgba(255,143,184,.45), 0 0 110px 36px rgba(194,37,92,.3);
+    opacity: .9; animation: moonGlow 6s ease-in-out infinite;
+  }
+  @keyframes moonGlow { 50% { box-shadow: 0 0 52px 16px rgba(255,143,184,.6), 0 0 140px 50px rgba(194,37,92,.4); } }
+
+  #bg .bigheart {
+    position: absolute; left: 50%; top: 46%; font-size: min(72vw, 380px); line-height: 1;
+    color: #ff2d6f; opacity: .075; filter: blur(2px);
+    transform: translate(-50%,-50%); animation: heartbeat 2.6s ease-in-out infinite;
+  }
+  @keyframes heartbeat {
+    0%,100% { transform: translate(-50%,-50%) scale(1); }
+    14%     { transform: translate(-50%,-50%) scale(1.08); }
+    28%     { transform: translate(-50%,-50%) scale(1); }
+    42%     { transform: translate(-50%,-50%) scale(1.12); }
+  }
+
   #bg .star {
     position: absolute; border-radius: 50%; background: #fff;
-    box-shadow: 0 0 6px 1px rgba(255,255,255,.8); opacity: .1;
+    box-shadow: 0 0 6px 1px rgba(255,200,225,.85); opacity: .1;
     animation: twinkle 3s ease-in-out infinite;
   }
-  [data-theme="light"] #bg .star { background: #fff; box-shadow: 0 0 6px 1px rgba(255,255,255,.95); }
   @keyframes twinkle { 0%,100% { opacity: .08; transform: scale(.7); } 50% { opacity: .95; transform: scale(1.3); } }
 
-  #bg .sp {
-    position: absolute; bottom: -24px; border-radius: 50%;
-    background: radial-gradient(circle, rgba(255,255,255,.95), rgba(255,255,255,.1));
-    box-shadow: 0 0 12px rgba(255,255,255,.7); opacity: 0;
-    animation: rise linear infinite;
+  #bg .heart {
+    position: absolute; bottom: -60px; opacity: 0; color: #ff5c93;
+    text-shadow: 0 0 12px rgba(255,92,147,.9); animation: heartUp linear infinite; will-change: transform;
   }
-  @keyframes rise {
-    0%   { transform: translate(0,0) scale(.6); opacity: 0; }
-    12%  { opacity: .85; }
-    100% { transform: translate(40px,-112vh) scale(1.1); opacity: 0; }
+  @keyframes heartUp {
+    0%   { transform: translate(0,0) rotate(-12deg) scale(.7); opacity: 0; }
+    10%  { opacity: .85; }
+    25%  { transform: translate(var(--sx),-30vh) rotate(10deg) scale(1); }
+    50%  { transform: translate(calc(var(--sx) * -1),-60vh) rotate(-8deg) scale(1.1); }
+    75%  { transform: translate(var(--sx),-90vh) rotate(8deg) scale(1); }
+    100% { transform: translate(0,-125vh) rotate(-10deg) scale(.8); opacity: 0; }
+  }
+
+  #bg .petal {
+    position: absolute; top: -30px; width: 12px; height: 16px; opacity: .8;
+    background: radial-gradient(circle at 30% 30%, #ff7aa8, #c2185b);
+    border-radius: 150% 0 150% 0; animation: petalFall linear infinite;
+  }
+  @keyframes petalFall {
+    0%   { transform: translate(0,-5vh) rotate(0deg); }
+    25%  { transform: translate(40px,25vh) rotate(120deg); }
+    50%  { transform: translate(-30px,55vh) rotate(240deg); }
+    75%  { transform: translate(35px,85vh) rotate(330deg); }
+    100% { transform: translate(-10px,112vh) rotate(420deg); opacity: .2; }
   }
 
   #bg .shoot {
-    position: absolute; top: 12%; left: -20%; width: 140px; height: 2px; opacity: 0;
-    background: linear-gradient(90deg, transparent, #fff); transform: rotate(24deg);
-    animation: shoot 11s linear infinite; display: none;
+    position: absolute; top: 14%; left: -20%; width: 150px; height: 2px; opacity: 0;
+    background: linear-gradient(90deg, transparent, #ffd1e3); transform: rotate(24deg);
+    animation: shoot 12s linear infinite;
   }
-  [data-theme="dark"] #bg .shoot { display: block; }
   @keyframes shoot {
     0%, 88% { opacity: 0; transform: translate(0,0) rotate(24deg); }
     90%     { opacity: 1; }
     100%    { opacity: 0; transform: translate(120vw, 55vh) rotate(24deg); }
   }
-
-  form { backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); }
-
-  @media (prefers-reduced-motion: reduce) {
-    #bg, #bg * { animation: none !important; }
-  }
+  @media (prefers-reduced-motion: reduce) { #bg, #bg * { animation: none !important; } }
   .hidden { display: none !important; }
 </style>
 </head>
-<body>
+<body class="locked">
 
 <div id="bg" aria-hidden="true">
   <div class="flow"></div>
   <div class="orb o1"></div><div class="orb o2"></div>
   <div class="orb o3"></div><div class="orb o4"></div>
+  <div class="bigheart">❤</div>
+  <div class="moon"></div>
   <div class="shoot"></div>
 </div>
 
 <div id="login">
-  <h1>مرحبًا 👋</h1>
-  <p>اكتب اسمك للدخول إلى الدردشة</p>
-  <input id="nameInput" type="text" placeholder="اسمك" maxlength="20" autocomplete="off">
+  <div class="lh">❤</div>
+  <h1>تسجيل الدخول</h1>
+  <p class="sub">اكتب اسم المستخدم والكود</p>
+  <input id="userInput" type="text" placeholder="اسم المستخدم" maxlength="20" autocomplete="off" autocapitalize="off">
+  <input id="codeInput" type="password" placeholder="الكود" autocomplete="off" autocapitalize="off">
   <button id="enterBtn">دخول</button>
+  <div id="loginErr"></div>
+  <button id="showCode" class="link" type="button">إظهار الكود</button>
 </div>
 
 <header>
-  <div class="title"><span id="dot" title="حالة الاتصال"></span> 💬 الدردشة <small style="opacity:.6;font-size:10px;font-weight:400">v5</small></div>
+  <div class="title"><span id="dot" title="حالة الاتصال"></span> 💞 محادثتنا <small style="opacity:.6;font-size:10px;font-weight:400">v6</small></div>
   <div class="right">
     <span id="who"></span>
     <button class="icon-btn" id="soundBtn" title="الصوت">🔔</button>
-    <button class="icon-btn" id="themeBtn" title="الوضع الليلي">🌙</button>
+    <button class="icon-btn" id="clearBtn" title="حذف المحادثة كاملة">🗑</button>
+    <button class="icon-btn" id="logoutBtn" title="تسجيل الخروج">🚪</button>
   </div>
 </header>
 
-<div id="messages"><div id="empty">لا توجد رسائل بعد، ابدأ المحادثة ✨</div></div>
+<div id="messages"><div id="empty">لا توجد رسائل بعد، ابدأ المحادثة 💕</div></div>
 <button id="toBottom" class="hidden" aria-label="للأسفل">⬇<span id="badge" class="hidden">0</span></button>
 
 <div id="recBar" class="hidden">
@@ -305,42 +336,35 @@
   const box = $("messages");
   const store = {
     get(k, d) { try { return localStorage.getItem(k) ?? d; } catch (e) { return d; } },
-    set(k, v) { try { localStorage.setItem(k, v); } catch (e) {} }
+    set(k, v) { try { localStorage.setItem(k, v); } catch (e) {} },
+    del(k) { try { localStorage.removeItem(k); } catch (e) {} }
   };
 
-  // ---------- نجوم وشرارات الخلفية ----------
+  // ---------- عناصر الخلفية: قلوب وبتلات ونجوم ----------
   (function () {
     const bg = $("bg");
     const r = (a, b) => a + Math.random() * (b - a);
-    for (let i = 0; i < 36; i++) {
+    const hearts = ["❤", "💖", "💗", "💕", "♥", "💘"];
+    for (let i = 0; i < 40; i++) {
       const s = document.createElement("i");
       s.className = "star";
       const z = r(1.5, 3.5);
       s.style.cssText = `left:${r(0,100)}%;top:${r(0,100)}%;width:${z}px;height:${z}px;animation-delay:-${r(0,4)}s;animation-duration:${r(2,5)}s`;
       bg.appendChild(s);
     }
-    for (let i = 0; i < 14; i++) {
-      const s = document.createElement("i");
-      s.className = "sp";
-      const z = r(4, 12);
-      s.style.cssText = `left:${r(0,100)}%;width:${z}px;height:${z}px;animation-duration:${r(14,30)}s;animation-delay:-${r(0,25)}s`;
-      bg.appendChild(s);
+    for (let i = 0; i < 18; i++) {
+      const h = document.createElement("i");
+      h.className = "heart"; h.textContent = hearts[i % hearts.length];
+      h.style.cssText = `left:${r(0,94)}%;font-size:${r(14,34)}px;--sx:${r(-30,30)}px;animation-duration:${r(14,28)}s;animation-delay:-${r(0,28)}s`;
+      bg.appendChild(h);
+    }
+    for (let i = 0; i < 10; i++) {
+      const p = document.createElement("i");
+      p.className = "petal";
+      p.style.cssText = `left:${r(0,96)}%;width:${r(9,15)}px;height:${r(12,19)}px;animation-duration:${r(16,30)}s;animation-delay:-${r(0,30)}s`;
+      bg.appendChild(p);
     }
   })();
-
-  // ---------- الوضع الليلي ----------
-  function applyTheme(t) {
-    document.documentElement.dataset.theme = t;
-    $("themeBtn").textContent = t === "dark" ? "☀️" : "🌙";
-    document.querySelector('meta[name="theme-color"]').content = t === "dark" ? "#134e5a" : "#0b7285";
-  }
-  let theme = store.get("chat_theme", matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
-  applyTheme(theme);
-  $("themeBtn").onclick = () => {
-    theme = theme === "dark" ? "light" : "dark";
-    store.set("chat_theme", theme);
-    applyTheme(theme);
-  };
 
   // ---------- الصوت ----------
   let soundOn = store.get("chat_sound", "1") === "1";
@@ -369,26 +393,58 @@
   onValue(ref(db, ".info/serverTimeOffset"), (s) => { serverOffset = s.val() || 0; });
   onValue(ref(db, ".info/connected"), (s) => $("dot").classList.toggle("on", s.val() === true));
 
-  // ---------- الاسم ----------
+  // ---------- الدخول (اسم المستخدم + الكود) ----------
+  // تنبيه: هذا حاجز بسيط داخل الصفحة، وليس حماية حقيقية للبيانات.
+  const CODE_HASH = "4227e31ecd356cc82d74b5da6bd26b2441b38d785c9d540ae7d0deb130d4ba68";
+  const ALLOWED_USERS = [];   // اتركها فارغة ليدخل أي اسم، أو اكتب الأسماء المسموحة مثل ["ilias", "douaa"]
+
+  async function sha256(s) {
+    const b = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(s));
+    return Array.from(new Uint8Array(b)).map((x) => x.toString(16).padStart(2, "0")).join("");
+  }
   let myName = store.get("chat_name", "");
+
+  function loginError(msg) {
+    $("loginErr").textContent = msg;
+    const l = $("login"); l.classList.remove("shake"); void l.offsetWidth; l.classList.add("shake");
+  }
+  async function tryLogin() {
+    const n = $("userInput").value.trim();
+    const c = $("codeInput").value.trim().toLowerCase();
+    $("loginErr").textContent = "";
+    if (!n || !c) { loginError("اكتب اسم المستخدم والكود"); return; }
+    let h;
+    try { h = await sha256(c); }
+    catch (e) { loginError("المتصفح لا يدعم التحقق. افتح الرابط في Chrome."); return; }
+    const userOk = !ALLOWED_USERS.length || ALLOWED_USERS.map((u) => u.toLowerCase()).includes(n.toLowerCase());
+    if (h !== CODE_HASH || !userOk) { loginError("معلومات غير صحيحة"); return; }
+    myName = n.slice(0, 20);
+    store.set("chat_name", myName); store.set("chat_auth", h);
+    startChat();
+  }
   function startChat() {
+    document.body.classList.remove("locked");
     $("login").classList.add("hidden");
     $("who").textContent = myName;
     listen();
   }
-  if (myName) setTimeout(startChat, 0);   // بعد اكتمال تهيئة بقية الكود
-  else {
-    $("enterBtn").onclick = () => {
-      const n = $("nameInput").value.trim();
-      if (!n) return;
-      myName = n; store.set("chat_name", n); startChat();
-    };
-    $("nameInput").addEventListener("keydown", (e) => { if (e.key === "Enter") $("enterBtn").click(); });
-  }
+  $("enterBtn").onclick = tryLogin;
+  $("codeInput").addEventListener("keydown", (e) => { if (e.key === "Enter") tryLogin(); });
+  $("userInput").addEventListener("keydown", (e) => { if (e.key === "Enter") $("codeInput").focus(); });
+  $("showCode").onclick = () => {
+    const c = $("codeInput"); const show = c.type === "password";
+    c.type = show ? "text" : "password"; $("showCode").textContent = show ? "إخفاء الكود" : "إظهار الكود";
+  };
+  $("logoutBtn").onclick = () => {
+    if (!confirm("تسجيل الخروج؟")) return;
+    store.del("chat_auth"); store.del("chat_name"); location.reload();
+  };
   $("who").onclick = () => {
     const n = prompt("غيّر اسمك:", myName);
     if (n && n.trim()) { myName = n.trim().slice(0, 20); store.set("chat_name", myName); location.reload(); }
   };
+  // دخول تلقائي إن سبق تسجيل الدخول على هذا الهاتف (بعد اكتمال تهيئة بقية الكود)
+  if (myName && store.get("chat_auth", "") === CODE_HASH) setTimeout(startChat, 0);
 
   // ---------- أدوات العرض ----------
   const urlRe = /(https?:\/\/[^\s<]+)/g;
@@ -431,7 +487,6 @@
   });
   const pickMime = (list) => list.find((t) => window.MediaRecorder && MediaRecorder.isTypeSupported(t)) || "";
 
-  // تحميل الوسائط عند ظهورها على الشاشة فقط (لتخفيف الاستهلاك)
   const io = new IntersectionObserver((entries) => {
     entries.forEach((en) => {
       if (!en.isIntersecting) return;
@@ -481,13 +536,12 @@
   $("viewer").onclick = () => $("viewer").classList.add("hidden");
 
   async function sendMedia(kind, data, extra = {}) {
-    if (!myName) throw new Error("اكتب اسمك أولًا");
+    if (!myName) throw new Error("سجّل الدخول أولًا");
     const mref = push(ref(db, "media"), { kind, data });
     await mref;
     await push(messagesRef, Object.assign({ name: myName, text: "", kind, mediaId: mref.key, ts: serverTimestamp() }, extra));
   }
 
-  // ----- الصور: تصغير وضغط تلقائي -----
   async function compressImage(file) {
     let bmp;
     try { bmp = await createImageBitmap(file); }
@@ -508,7 +562,6 @@
     }
   }
 
-  // ----- الفيديو: إعادة ترميز بجودة منخفضة (حتى 30 ثانية) -----
   async function prepareVideo(file) {
     const url = URL.createObjectURL(file);
     const v = document.createElement("video");
@@ -529,7 +582,7 @@
     try {
       ac = new (window.AudioContext || window.webkitAudioContext)();
       const dest = ac.createMediaStreamDestination();
-      ac.createMediaElementSource(v).connect(dest);   // الصوت يُسجَّل دون أن يُسمَع
+      ac.createMediaElementSource(v).connect(dest);
       dest.stream.getAudioTracks().forEach((t) => stream.addTrack(t));
       if (ac.state === "suspended") await ac.resume();
     } catch (e) {}
@@ -579,7 +632,6 @@
     }
   };
 
-  // ----- الرسائل الصوتية -----
   let rc = null;
   async function startRecording() {
     if (rc) return;
@@ -629,6 +681,20 @@
   $("recCancel").onclick = () => stopRecording(false);
   $("recSend").onclick = () => stopRecording(true);
 
+  // ---------- حذف المحادثة كاملة ----------
+  $("clearBtn").onclick = async () => {
+    if (!confirm("هل تريد حذف المحادثة كاملة؟\nستُحذف كل الرسائل والصور والتسجيلات عند الطرفين.")) return;
+    if (!confirm("تأكيد أخير: لا يمكن التراجع عن الحذف.")) return;
+    try {
+      toast("جاري حذف المحادثة...", 0);
+      await Promise.all([remove(messagesRef), remove(ref(db, "media"))]);
+      hideToast(); toast("تم حذف المحادثة");
+    } catch (err) {
+      hideToast();
+      alert("تعذّر الحذف: " + (err.message || err));
+    }
+  };
+
   // ---------- استقبال الرسائل ----------
   const loadTime = Date.now();
   const nodes = new Map();
@@ -639,6 +705,11 @@
     $("badge").textContent = unseen;
     $("badge").classList.toggle("hidden", unseen === 0);
     $("toBottom").classList.toggle("hidden", isNearBottom());
+  }
+
+  function resetChat() {
+    box.innerHTML = '<div id="empty">لا توجد رسائل بعد، ابدأ المحادثة 💕</div>';
+    lastDay = ""; unseen = 0; mediaCache.clear(); updateBadge();
   }
 
   function addMessage(key, m) {
@@ -709,6 +780,7 @@
     onChildRemoved(q, (snap) => {
       const el = nodes.get(snap.key);
       if (el) { el.remove(); nodes.delete(snap.key); }
+      if (nodes.size === 0) resetChat();
     });
     setTimeout(() => scrollBottom(false), 600);
   }
@@ -719,7 +791,7 @@
     if (!document.hidden) { hiddenCount = 0; document.title = baseTitle; }
   });
 
-  // ---------- الإرسال ----------
+  // ---------- إرسال الرسائل النصية ----------
   const input = $("input");
   function autoGrow() {
     input.style.height = "auto";
@@ -727,7 +799,6 @@
   }
   input.addEventListener("input", autoGrow);
   input.addEventListener("keydown", (e) => {
-    // Enter يرسل على الحاسوب، وShift+Enter سطر جديد
     if (e.key === "Enter" && !e.shiftKey && !/Mobi|Android|iPhone/i.test(navigator.userAgent)) {
       e.preventDefault(); $("form").requestSubmit();
     }
