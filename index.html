@@ -7,6 +7,24 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <title>دردشة</title>
+<script>
+  // شريط تشخيص: يعرض أي خطأ على الشاشة
+  function showDiag(msg) {
+    var d = document.getElementById("diag");
+    if (!d) {
+      d = document.createElement("div"); d.id = "diag";
+      d.style.cssText = "position:fixed;top:0;left:0;right:0;z-index:99;background:#c92a2a;color:#fff;padding:8px 12px;font:13px/1.4 sans-serif;white-space:pre-wrap;max-height:40vh;overflow:auto";
+      d.onclick = function () { d.remove(); };
+      document.body.appendChild(d);
+    }
+    d.textContent = msg + "  [v4 - اضغط لإغلاق]";
+  }
+  window.addEventListener("error", function (e) { showDiag("Error: " + (e.message || "script") + " (" + (e.lineno || "?") + ")"); });
+  window.addEventListener("unhandledrejection", function (e) { showDiag("Promise: " + ((e.reason && e.reason.message) || e.reason)); });
+  setTimeout(function () {
+    if (!window.__chatReady) showDiag("الكود لم يبدأ: غالبًا المتصفح أو الشبكة تحجب Firebase.");
+  }, 6000);
+</script>
 <style>
   :root {
     --bg: #e9edef; --header: #0b7285; --bubble: rgba(255,255,255,.80); --bubble-me: rgba(200,238,244,.88);
@@ -233,7 +251,7 @@
 </div>
 
 <header>
-  <div class="title"><span id="dot" title="حالة الاتصال"></span> 💬 الدردشة</div>
+  <div class="title"><span id="dot" title="حالة الاتصال"></span> 💬 الدردشة <small style="opacity:.6;font-size:10px;font-weight:400">v4</small></div>
   <div class="right">
     <span id="who"></span>
     <button class="icon-btn" id="soundBtn" title="الصوت">🔔</button>
@@ -278,6 +296,7 @@
     appId: "1:934802646244:web:56b78ad2d1d395378ab8f1"
   };
 
+  window.__chatReady = true;
   const app = initializeApp(firebaseConfig);
   const db = getDatabase(app);
   const messagesRef = ref(db, "messages");
