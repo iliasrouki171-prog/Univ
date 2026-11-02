@@ -17,7 +17,7 @@
       d.onclick = function () { d.remove(); };
       document.body.appendChild(d);
     }
-    d.textContent = msg + "  [v7 - اضغط لإغلاق]";
+    d.textContent = msg + "  [v8 - اضغط لإغلاق]";
   }
   window.addEventListener("error", function (e) { showDiag("Error: " + (e.message || "script") + " (" + (e.lineno || "?") + ")"); });
   window.addEventListener("unhandledrejection", function (e) { showDiag("Promise: " + ((e.reason && e.reason.message) || e.reason)); });
@@ -165,6 +165,51 @@
   }
   #viewer img { max-width: 100%; max-height: 100%; object-fit: contain; }
 
+  /* ===== رد / تفاعلات / علامة القراءة ===== */
+  .msg { cursor: pointer; }
+  .quote {
+    border-inline-start: 3px solid var(--accent); background: rgba(0,0,0,.25); border-radius: 8px;
+    padding: 4px 8px; margin-bottom: 5px; font-size: 13px; cursor: pointer; min-width: 0;
+  }
+  .quote .qn { color: var(--accent); font-weight: 600; font-size: 12px; }
+  .quote .qt { color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .flash { animation: flash 1.4s ease-out; }
+  @keyframes flash { 0%,45% { box-shadow: 0 0 0 3px #ff8fb8, 0 0 20px #ff5c93; } 100% { box-shadow: 0 2px 12px rgba(0,0,0,.35); } }
+  .rxrow { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 4px; }
+  button.rx {
+    background: rgba(255,255,255,.12); border: 1px solid rgba(255,255,255,.16); border-radius: 12px;
+    padding: 1px 8px; font-size: 13px; color: var(--text);
+  }
+  button.rx.mine { background: rgba(255,92,147,.38); border-color: #ff8fb8; }
+  .tick { font-size: 12px; letter-spacing: -3px; cursor: pointer; padding: 0 2px; }
+  .tick.read { color: #4dabf7; }
+  #replyBar {
+    display: flex; align-items: center; gap: 10px; padding: 8px 14px;
+    background: var(--bar); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+    border-top: 1px solid var(--chip); border-inline-start: 3px solid var(--accent);
+  }
+  #replyBar .rb { flex: 1; min-width: 0; }
+  #replyBar .rn { color: var(--accent); font-size: 12px; font-weight: 600; }
+  #replyBar .rt { color: var(--muted); font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  #replyBar button { background: none; font-size: 18px; padding: 0 6px; }
+  #sheet {
+    position: fixed; inset: 0; background: rgba(0,0,0,.5); z-index: 40;
+    display: flex; align-items: flex-end; justify-content: center;
+  }
+  #sheet .panel {
+    width: 100%; max-width: 480px; background: #1c0f1e; border-radius: 20px 20px 0 0;
+    padding: 14px 14px calc(14px + env(safe-area-inset-bottom)); border-top: 1px solid rgba(255,143,184,.25);
+  }
+  #sheet .emojis { display: flex; justify-content: space-around; gap: 4px; margin-bottom: 8px; }
+  #sheet .emojis button {
+    background: rgba(255,255,255,.08); border-radius: 50%; width: 42px; height: 42px; padding: 0; font-size: 22px;
+  }
+  #sheet .emojis button.sel { background: rgba(255,92,147,.4); outline: 2px solid #ff8fb8; }
+  #sheet .acts button {
+    width: 100%; text-align: start; background: rgba(255,255,255,.07); border-radius: 12px;
+    padding: 13px 16px; margin-top: 8px; font-size: 16px;
+  }
+
   /* ===== الخلفية الرومانسية المتحركة ===== */
   #bg { position: fixed; inset: 0; z-index: -1; overflow: hidden; pointer-events: none; }
   body.locked #bg, body.locked #bg * { animation-play-state: paused !important; }
@@ -278,7 +323,7 @@
 </div>
 
 <header>
-  <div class="title"><span id="dot" title="حالة الاتصال"></span> 💞 محادثتنا <small style="opacity:.6;font-size:10px;font-weight:400">v7</small></div>
+  <div class="title"><span id="dot" title="حالة الاتصال"></span> 💞 محادثتنا <small style="opacity:.6;font-size:10px;font-weight:400">v8</small></div>
   <div class="right">
     <span id="who"></span>
     <button class="icon-btn" id="soundBtn" title="الصوت">🔔</button>
@@ -289,6 +334,11 @@
 
 <div id="messages"><div id="empty">لا توجد رسائل بعد، ابدأ المحادثة 💕</div></div>
 <button id="toBottom" class="hidden" aria-label="للأسفل">⬇<span id="badge" class="hidden">0</span></button>
+
+<div id="replyBar" class="hidden">
+  <div class="rb"><div class="rn" id="replyName"></div><div class="rt" id="replyText"></div></div>
+  <button type="button" id="replyCancel" aria-label="إلغاء الرد">✕</button>
+</div>
 
 <div id="recBar" class="hidden">
   <span class="rdot"></span><span id="recTime">0:00</span><span class="grow">جاري التسجيل...</span>
@@ -307,10 +357,20 @@
 <div id="toast" class="hidden"></div>
 <div id="viewer" class="hidden"><img id="viewerImg" alt=""></div>
 
+<div id="sheet" class="hidden">
+  <div class="panel">
+    <div class="emojis" id="sheetEmojis"></div>
+    <div class="acts">
+      <button type="button" id="actReply">↩ رد</button>
+      <button type="button" id="actCopy">📋 نسخ النص</button>
+    </div>
+  </div>
+</div>
+
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
   import {
-    getDatabase, ref, push, remove, onChildAdded, onChildRemoved, onValue,
+    getDatabase, ref, push, set, remove, onChildAdded, onChildRemoved, onChildChanged, onValue,
     query, limitToLast, serverTimestamp, get
   } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-database.js";
 
@@ -467,6 +527,117 @@
   const isNearBottom = () => box.scrollHeight - box.scrollTop - box.clientHeight < 90;
   const scrollBottom = (smooth = true) => box.scrollTo({ top: box.scrollHeight, behavior: smooth ? "smooth" : "auto" });
 
+  // ---------- الرد / التفاعلات / علامة القراءة ----------
+  const keyOf = (n) => encodeURIComponent(n).replace(/\./g, "%2E");
+  const EMOJIS = ["❤️", "😂", "😮", "😢", "👍", "🙏", "🔥"];
+  const msgs = new Map();            // مفتاح الرسالة -> { div, m, tick, rxRow }
+  let replyTo = null, reads = {}, sheetKey = null;
+  const hhmm = (ts) => new Date(ts).toLocaleTimeString("fr-DZ", { hour: "2-digit", minute: "2-digit" });
+  const snippetOf = (m) => m.text ? String(m.text).slice(0, 80)
+    : (m.kind === "image" ? "📷 صورة" : m.kind === "audio" ? "🎤 رسالة صوتية" : m.kind === "video" ? "🎬 فيديو" : "");
+
+  // علامة القراءة: كل مستخدم يسجّل آخر وقت رأى فيه المحادثة
+  onValue(ref(db, "reads"), (s) => { reads = s.val() || {}; updateTicks(); });
+  function othersReadAt(ts) {
+    return Object.values(reads).filter((v) => v && v.name !== myName && v.ts >= ts);
+  }
+  function updateTicks() {
+    msgs.forEach((e) => {
+      if (!e.tick) return;
+      const r = e.m.ts ? othersReadAt(e.m.ts) : [];
+      e.tick.textContent = r.length ? "✓✓" : "✓";
+      e.tick.classList.toggle("read", r.length > 0);
+    });
+  }
+  function showReaders(key) {
+    const e = msgs.get(key); if (!e) return;
+    const r = e.m.ts ? othersReadAt(e.m.ts) : [];
+    if (!r.length) { toast("لم تُقرأ بعد"); return; }
+    const last = Math.max(...r.map((x) => x.ts));
+    toast("قرأها " + r.map((x) => x.name).join("، ") + " · آخر ظهور " + hhmm(last), 3500);
+  }
+  let markTimer;
+  function markRead() {
+    if (!myName || document.hidden) return;
+    clearTimeout(markTimer);
+    markTimer = setTimeout(() => {
+      if (document.hidden) return;
+      set(ref(db, "reads/" + keyOf(myName)), { name: myName, ts: serverTimestamp() }).catch(() => {});
+    }, 600);
+  }
+
+  // التفاعل بالإيموجي (تفاعل واحد لكل شخص على الرسالة، والضغط عليه مرة ثانية يلغيه)
+  async function react(key, emo) {
+    const e = msgs.get(key); if (!e || !myName) return;
+    const r = ref(db, "messages/" + key + "/reactions/" + keyOf(myName));
+    const cur = e.m.reactions && e.m.reactions[keyOf(myName)];
+    try {
+      if (cur && cur.e === emo) await remove(r);
+      else await set(r, { name: myName, e: emo });
+    } catch (err) { alert("تعذّر التفاعل: " + (err.message || err)); }
+  }
+  function renderReactions(key) {
+    const e = msgs.get(key); if (!e) return;
+    const groups = {};
+    Object.values(e.m.reactions || {}).forEach((v) => {
+      if (v && v.e) (groups[v.e] = groups[v.e] || []).push(v.name);
+    });
+    e.rxRow.textContent = "";
+    Object.entries(groups).forEach(([emo, names]) => {
+      const b = document.createElement("button");
+      b.type = "button"; b.className = "rx" + (names.includes(myName) ? " mine" : "");
+      b.textContent = emo + (names.length > 1 ? " " + names.length : "");
+      b.title = names.join("، ");
+      b.onclick = () => react(key, emo);
+      e.rxRow.appendChild(b);
+    });
+    e.rxRow.classList.toggle("hidden", !Object.keys(groups).length);
+  }
+
+  // الرد على رسالة
+  function setReply(key) {
+    const e = msgs.get(key); if (!e) return;
+    replyTo = { key, name: e.m.name, text: snippetOf(e.m) };
+    $("replyName").textContent = "رد على " + e.m.name;
+    $("replyText").textContent = replyTo.text;
+    $("replyBar").classList.remove("hidden");
+    $("input").focus();
+  }
+  function clearReply() { replyTo = null; $("replyBar").classList.add("hidden"); }
+  $("replyCancel").onclick = clearReply;
+  function jumpTo(key) {
+    const e = msgs.get(key);
+    if (!e) { toast("الرسالة الأصلية غير موجودة"); return; }
+    e.div.scrollIntoView({ behavior: "smooth", block: "center" });
+    e.div.classList.remove("flash"); void e.div.offsetWidth; e.div.classList.add("flash");
+  }
+
+  // قائمة الإجراءات عند الضغط على رسالة
+  function openSheet(key) {
+    const e = msgs.get(key); if (!e) return;
+    sheetKey = key;
+    const mine = e.m.reactions && e.m.reactions[keyOf(myName)];
+    const wrap = $("sheetEmojis"); wrap.textContent = "";
+    EMOJIS.forEach((emo) => {
+      const b = document.createElement("button");
+      b.type = "button"; b.textContent = emo;
+      if (mine && mine.e === emo) b.className = "sel";
+      b.onclick = () => { closeSheet(); react(key, emo); };
+      wrap.appendChild(b);
+    });
+    $("actCopy").classList.toggle("hidden", !e.m.text);
+    $("sheet").classList.remove("hidden");
+  }
+  function closeSheet() { $("sheet").classList.add("hidden"); sheetKey = null; }
+  $("sheet").onclick = (ev) => { if (ev.target === $("sheet")) closeSheet(); };
+  $("actReply").onclick = () => { const k = sheetKey; closeSheet(); if (k) setReply(k); };
+  $("actCopy").onclick = async () => {
+    const e = msgs.get(sheetKey); closeSheet();
+    if (!e) return;
+    try { await navigator.clipboard.writeText(e.m.text); toast("تم النسخ"); }
+    catch (err) { toast("تعذّر النسخ"); }
+  };
+
   // ---------- الوسائط (صور / صوت / فيديو) ----------
   const MAX_VIDEO_SEC = 30, MAX_AUDIO_SEC = 90;
   const mediaCache = new Map();
@@ -536,7 +707,10 @@
     if (!myName) throw new Error("سجّل الدخول أولًا");
     const mref = push(ref(db, "media"), { kind, data });
     await mref;
-    await push(messagesRef, Object.assign({ name: myName, text: "", kind, mediaId: mref.key, ts: serverTimestamp() }, extra));
+    const payload = Object.assign({ name: myName, text: "", kind, mediaId: mref.key, ts: serverTimestamp() }, extra);
+    if (replyTo) payload.reply = replyTo;
+    await push(messagesRef, payload);
+    clearReply();
   }
 
   async function compressImage(file) {
@@ -706,7 +880,7 @@
 
   function resetChat() {
     box.innerHTML = '<div id="empty">لا توجد رسائل بعد، ابدأ المحادثة 💕</div>';
-    lastDay = ""; unseen = 0; mediaCache.clear(); updateBadge();
+    lastDay = ""; unseen = 0; mediaCache.clear(); msgs.clear(); updateBadge();
   }
 
   function addMessage(key, m) {
@@ -728,11 +902,24 @@
       const n = document.createElement("div");
       n.className = "name"; n.textContent = m.name; div.appendChild(n);
     }
+    if (m.reply) {
+      const q = document.createElement("div");
+      q.className = "quote";
+      const qn = document.createElement("div"); qn.className = "qn"; qn.textContent = m.reply.name;
+      const qt = document.createElement("div"); qt.className = "qt"; qt.textContent = m.reply.text;
+      q.appendChild(qn); q.appendChild(qt);
+      q.onclick = () => jumpTo(m.reply.key);
+      div.appendChild(q);
+    }
     if (m.mediaId) div.appendChild(makeMediaSlot(m));
     if (m.text) {
       const t = document.createElement("div");
       t.className = "text"; t.appendChild(linkify(String(m.text))); div.appendChild(t);
     }
+
+    const rxRow = document.createElement("div");
+    rxRow.className = "rxrow hidden";
+    div.appendChild(rxRow);
 
     const meta = document.createElement("div");
     meta.className = "meta";
@@ -749,10 +936,25 @@
     const tm = document.createElement("span");
     tm.textContent = new Date(ts).toLocaleTimeString("fr-DZ", { hour: "2-digit", minute: "2-digit" });
     meta.appendChild(tm);
+    let tick = null;
+    if (mine) {
+      tick = document.createElement("span");
+      tick.className = "tick"; tick.textContent = "✓";
+      tick.onclick = () => showReaders(key);
+      meta.appendChild(tick);
+    }
     div.appendChild(meta);
+    div.addEventListener("click", (ev) => {
+      if (ev.target.closest("button, a, img, audio, video, .quote, .tick")) return;
+      if (String(window.getSelection && window.getSelection()).length) return;
+      openSheet(key);
+    });
 
     box.appendChild(div);
     nodes.set(key, div);
+    msgs.set(key, { div, m, tick, rxRow });
+    renderReactions(key);
+    updateTicks();
 
     const isNew = m.ts && m.ts > loadTime + serverOffset - 3000;
     if (mine || wasBottom) scrollBottom(isNew);
@@ -763,6 +965,7 @@
       if (document.hidden) { hiddenCount++; document.title = `(${hiddenCount}) ${baseTitle}`; }
       if (navigator.vibrate) navigator.vibrate(60);
     }
+    if (!mine && wasBottom) markRead();
     updateBadge();
   }
 
@@ -774,18 +977,27 @@
     onChildAdded(q, (snap) => addMessage(snap.key, snap.val()), (err) => {
       alert("تعذّرت قراءة الرسائل: " + err.message + "\n\nتحقق من قواعد Firebase (Règles).");
     });
+    onChildChanged(q, (snap) => {
+      const e = msgs.get(snap.key);
+      if (!e) return;
+      e.m = snap.val();
+      renderReactions(snap.key);
+      updateTicks();
+    });
     onChildRemoved(q, (snap) => {
       const el = nodes.get(snap.key);
       if (el) { el.remove(); nodes.delete(snap.key); }
+      msgs.delete(snap.key);
       if (nodes.size === 0) resetChat();
     });
     setTimeout(() => scrollBottom(false), 600);
+    setTimeout(markRead, 1200);
   }
 
-  box.addEventListener("scroll", () => { if (isNearBottom()) unseen = 0; updateBadge(); });
-  $("toBottom").onclick = () => { scrollBottom(); unseen = 0; updateBadge(); };
+  box.addEventListener("scroll", () => { if (isNearBottom()) { unseen = 0; markRead(); } updateBadge(); });
+  $("toBottom").onclick = () => { scrollBottom(); unseen = 0; updateBadge(); markRead(); };
   document.addEventListener("visibilitychange", () => {
-    if (!document.hidden) { hiddenCount = 0; document.title = baseTitle; }
+    if (!document.hidden) { hiddenCount = 0; document.title = baseTitle; if (isNearBottom()) markRead(); }
   });
 
   // ---------- إرسال الرسائل النصية ----------
@@ -804,11 +1016,13 @@
     e.preventDefault();
     const text = input.value.trim();
     if (!text || !myName) return;
-    push(messagesRef, { name: myName, text, ts: serverTimestamp() }).catch((err) => {
+    const payload = { name: myName, text, ts: serverTimestamp() };
+    if (replyTo) payload.reply = replyTo;
+    push(messagesRef, payload).catch((err) => {
       alert("فشل الإرسال: " + err.message + "\n\nالسبب غالبًا قواعد Firebase (Règles) لا تسمح بالكتابة.");
       input.value = text; autoGrow();
     });
-    input.value = ""; autoGrow(); input.focus();
+    input.value = ""; autoGrow(); clearReply(); input.focus();
   });
 </script>
 </body>
