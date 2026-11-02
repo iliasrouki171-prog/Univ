@@ -209,7 +209,7 @@
 
 <form id="form">
   <textarea id="input" rows="1" placeholder="اكتب رسالة..." maxlength="1000"></textarea>
-  <button type="submit" id="send" disabled>إرسال</button>
+  <button type="submit" id="send">إرسال</button>
 </form>
 
 <script type="module">
@@ -413,7 +413,9 @@
     if (listening) return;
     listening = true;
     const q = query(messagesRef, limitToLast(200));
-    onChildAdded(q, (snap) => addMessage(snap.key, snap.val()));
+    onChildAdded(q, (snap) => addMessage(snap.key, snap.val()), (err) => {
+      alert("تعذّرت قراءة الرسائل: " + err.message + "\n\nتحقق من قواعد Firebase (Règles).");
+    });
     onChildRemoved(q, (snap) => {
       const el = nodes.get(snap.key);
       if (el) { el.remove(); nodes.delete(snap.key); }
@@ -432,7 +434,6 @@
   function autoGrow() {
     input.style.height = "auto";
     input.style.height = Math.min(input.scrollHeight, 120) + "px";
-    $("send").disabled = !input.value.trim();
   }
   input.addEventListener("input", autoGrow);
   input.addEventListener("keydown", (e) => {
@@ -445,7 +446,10 @@
     e.preventDefault();
     const text = input.value.trim();
     if (!text || !myName) return;
-    push(messagesRef, { name: myName, text, ts: serverTimestamp() });
+    push(messagesRef, { name: myName, text, ts: serverTimestamp() }).catch((err) => {
+      alert("فشل الإرسال: " + err.message + "\n\nالسبب غالبًا قواعد Firebase (Règles) لا تسمح بالكتابة.");
+      input.value = text; autoGrow();
+    });
     input.value = ""; autoGrow(); input.focus();
   });
 </script>
