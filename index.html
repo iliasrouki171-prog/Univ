@@ -22,7 +22,7 @@
       d.onclick = function () { d.remove(); };
       document.body.appendChild(d);
     }
-    d.textContent = msg + "  [v10 - اضغط لإغلاق]";
+    d.textContent = msg + "  [v11 - اضغط لإغلاق]";
   }
   // نلتقط حدث التثبيت مبكرًا قبل أن يبدأ باقي الكود
   window.addEventListener("beforeinstallprompt", function (e) {
@@ -222,6 +222,40 @@
     padding: 13px 16px; margin-top: 8px; font-size: 16px;
   }
 
+  /* ===== إضافات v11 ===== */
+  header .hleft { display: flex; flex-direction: column; min-width: 0; }
+  .presence { font-size: 12px; color: rgba(255,255,255,.78); min-height: 15px; margin-top: 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .presence.typing { color: #ffd6e7; font-style: italic; }
+  #searchBar, #pinBar {
+    display: flex; align-items: center; gap: 8px; padding: 8px 12px; background: var(--bar);
+    backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border-bottom: 1px solid var(--chip);
+  }
+  #searchInput {
+    flex: 1; min-width: 0; padding: 9px 14px; border: none; border-radius: 18px; outline: none;
+    font-family: inherit; font-size: 15px; background: var(--input); color: var(--text);
+  }
+  #searchCount { color: var(--muted); font-size: 12px; white-space: nowrap; }
+  #searchBar button, #pinBar button { background: none; font-size: 18px; padding: 0 6px; }
+  #pinBar { border-inline-start: 3px solid var(--accent); cursor: pointer; }
+  #pinBar .pb { flex: 1; min-width: 0; }
+  #pinBar .pn { color: var(--accent); font-size: 12px; font-weight: 600; }
+  #pinBar .pt { color: var(--muted); font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .sr-hide { display: none !important; }
+  #messages.searching .day { display: none; }
+  #menu { position: fixed; inset: 0; z-index: 45; }
+  #menu .mpanel {
+    position: absolute; top: calc(54px + env(safe-area-inset-top)); left: 10px; min-width: 240px;
+    background: #1c0f1e; border: 1px solid rgba(255,143,184,.25); border-radius: 14px; padding: 6px;
+    box-shadow: 0 10px 30px rgba(0,0,0,.6);
+  }
+  button.mi { display: block; width: 100%; text-align: start; background: none; border-radius: 10px; padding: 12px 14px; font-size: 15px; }
+  button.mi:active { background: rgba(255,255,255,.1); }
+  button.mi.danger { color: #ff8787; }
+  .msg .edited, .msg .exp { font-size: 11px; color: var(--muted); }
+  .media.audio:not(.loading) { display: flex; align-items: center; gap: 6px; }
+  .media.audio audio { flex: 1; min-width: 0; width: auto; }
+  button.speed { background: rgba(255,255,255,.16); border-radius: 12px; padding: 4px 8px; font-size: 12px; flex: none; }
+
   /* ===== الخلفية الرومانسية المتحركة ===== */
   #bg { position: fixed; inset: 0; z-index: -1; overflow: hidden; pointer-events: none; }
   body.locked #bg, body.locked #bg * { animation-play-state: paused !important; }
@@ -335,15 +369,37 @@
 </div>
 
 <header>
-  <div class="title"><span id="dot" title="حالة الاتصال"></span> 💞 محادثتنا <small style="opacity:.6;font-size:10px;font-weight:400">v10</small></div>
+  <div class="hleft">
+    <div class="title"><span id="dot" title="حالة الاتصال"></span> 💞 محادثتنا <small style="opacity:.6;font-size:10px;font-weight:400">v11</small></div>
+    <div id="presence" class="presence"></div>
+  </div>
   <div class="right">
     <span id="who"></span>
-    <button class="icon-btn hidden" id="installBtn" title="تثبيت التطبيق">📲</button>
-    <button class="icon-btn" id="soundBtn" title="الصوت">🔔</button>
-    <button class="icon-btn" id="clearBtn" title="حذف المحادثة كاملة">🗑</button>
-    <button class="icon-btn" id="logoutBtn" title="تسجيل الخروج">🚪</button>
+    <button class="icon-btn" id="searchBtn" title="بحث">🔍</button>
+    <button class="icon-btn" id="menuBtn" title="القائمة">⋮</button>
   </div>
 </header>
+
+<div id="searchBar" class="hidden">
+  <input id="searchInput" type="search" placeholder="ابحث في المحادثة..." autocomplete="off">
+  <span id="searchCount"></span>
+  <button type="button" id="searchClose" aria-label="إغلاق البحث">✕</button>
+</div>
+
+<div id="pinBar" class="hidden">
+  <div class="pb"><div class="pn" id="pinName"></div><div class="pt" id="pinText"></div></div>
+  <button type="button" id="pinClose" aria-label="إلغاء التثبيت">✕</button>
+</div>
+
+<div id="menu" class="hidden">
+  <div class="mpanel">
+    <button type="button" class="mi hidden" id="installBtn">📲 تثبيت التطبيق</button>
+    <button type="button" class="mi" id="soundBtn">🔔 الصوت: مفعّل</button>
+    <button type="button" class="mi" id="ttlBtn">⏳ الرسائل المختفية: إيقاف</button>
+    <button type="button" class="mi danger" id="clearBtn">🗑 حذف المحادثة كاملة</button>
+    <button type="button" class="mi" id="logoutBtn">🚪 تسجيل الخروج</button>
+  </div>
+</div>
 
 <div id="messages"><div id="empty">لا توجد رسائل بعد، ابدأ المحادثة 💕</div></div>
 <button id="toBottom" class="hidden" aria-label="للأسفل">⬇<span id="badge" class="hidden">0</span></button>
@@ -376,6 +432,8 @@
     <div class="acts">
       <button type="button" id="actReply">↩ رد</button>
       <button type="button" id="actCopy">📋 نسخ النص</button>
+      <button type="button" id="actPin">📌 تثبيت الرسالة</button>
+      <button type="button" id="actEdit">✏️ تعديل</button>
     </div>
   </div>
 </div>
@@ -384,7 +442,7 @@
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
   import {
     getDatabase, ref, push, set, remove, onChildAdded, onChildRemoved, onChildChanged, onValue,
-    query, limitToLast, serverTimestamp, get
+    query, limitToLast, serverTimestamp, get, onDisconnect
   } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-database.js";
 
   const firebaseConfig = {
@@ -453,11 +511,12 @@
 
   // ---------- الصوت ----------
   let soundOn = store.get("chat_sound", "1") === "1";
-  $("soundBtn").textContent = soundOn ? "🔔" : "🔕";
+  const soundLabel = () => (soundOn ? "🔔 الصوت: مفعّل" : "🔕 الصوت: مكتوم");
+  $("soundBtn").textContent = soundLabel();
   $("soundBtn").onclick = () => {
     soundOn = !soundOn;
     store.set("chat_sound", soundOn ? "1" : "0");
-    $("soundBtn").textContent = soundOn ? "🔔" : "🔕";
+    $("soundBtn").textContent = soundLabel();
     if (soundOn) beep();
   };
   let audioCtx;
@@ -512,6 +571,7 @@
     $("login").classList.add("hidden");
     $("who").textContent = myName;
     listen();
+    initPresence(); initTyping(); initPinned(); initTtl(); startSweeper();
   }
   $("enterBtn").onclick = tryLogin;
   $("codeInput").addEventListener("keydown", (e) => { if (e.key === "Enter") tryLogin(); });
@@ -654,6 +714,8 @@
       wrap.appendChild(b);
     });
     $("actCopy").classList.toggle("hidden", !e.m.text);
+    $("actEdit").classList.toggle("hidden", !(e.m.name === myName && e.m.text));
+    $("actPin").textContent = (pinned && pinned.key === key) ? "📌 إلغاء التثبيت" : "📌 تثبيت الرسالة";
     $("sheet").classList.remove("hidden");
   }
   function closeSheet() { $("sheet").classList.add("hidden"); sheetKey = null; }
@@ -724,6 +786,14 @@
         el = document.createElement("video"); el.controls = true; el.playsInline = true; el.preload = "metadata"; el.src = rec.data;
       }
       slot.appendChild(el);
+      if (rec.kind === "audio") {
+        const sp = document.createElement("button");
+        sp.type = "button"; sp.className = "speed"; sp.textContent = "1x"; sp.title = "سرعة التشغيل";
+        const rates = [1, 1.5, 2]; let ri = 0;
+        sp.onclick = () => { ri = (ri + 1) % rates.length; el.playbackRate = rates[ri]; sp.textContent = rates[ri] + "x"; };
+        el.addEventListener("play", () => { el.playbackRate = rates[ri]; });
+        slot.appendChild(sp);
+      }
       if (stick) scrollBottom(false);
     } catch (err) {
       slot.textContent = "⚠️ تعذّر التحميل";
@@ -737,6 +807,7 @@
     await mref;
     const payload = Object.assign({ name: myName, text: "", kind, mediaId: mref.key, ts: serverTimestamp() }, extra);
     if (replyTo) payload.reply = replyTo;
+    if (ttl) payload.exp = nowMs() + ttl * 1000;
     await push(messagesRef, payload);
     clearReply();
   }
@@ -886,13 +957,176 @@
     if (!confirm("تأكيد أخير: لا يمكن التراجع عن الحذف.")) return;
     try {
       toast("جاري حذف المحادثة...", 0);
-      await Promise.all([remove(messagesRef), remove(ref(db, "media"))]);
+      await Promise.all([remove(messagesRef), remove(ref(db, "media")), remove(ref(db, "pinned"))]);
       hideToast(); toast("تم حذف المحادثة");
     } catch (err) {
       hideToast();
       alert("تعذّر الحذف: " + (err.message || err));
     }
   };
+
+  // ---------- إضافات v11 ----------
+  const menuEl = $("menu");
+  $("menuBtn").onclick = () => menuEl.classList.remove("hidden");
+  menuEl.addEventListener("click", (ev) => {
+    if (ev.target === menuEl || ev.target.closest("button.mi")) menuEl.classList.add("hidden");
+  });
+  function nowMs() { return Date.now() + serverOffset; }
+
+  // --- متصل الآن / آخر ظهور / يكتب الآن ---
+  let presence = {}, typingMap = {};
+  const othersOf = (obj) => Object.values(obj || {}).filter((v) => v && v.name && v.name !== myName);
+  function lastSeenLabel(ts) {
+    const d = dayLabel(ts), t = hhmm(ts);
+    return d === "اليوم" ? "اليوم " + t : d === "أمس" ? "أمس " + t : d + " " + t;
+  }
+  function renderPresence() {
+    const el = $("presence");
+    const typers = othersOf(typingMap).filter((v) => v.ts && nowMs() - v.ts < 6000);
+    if (typers.length) {
+      el.textContent = typers.map((v) => v.name).join("، ") + " يكتب الآن...";
+      el.classList.add("typing"); return;
+    }
+    el.classList.remove("typing");
+    const o = othersOf(presence);
+    if (!o.length) { el.textContent = ""; return; }
+    const on = o.filter((v) => v.online);
+    if (on.length) { el.textContent = "🟢 " + on.map((v) => v.name).join("، ") + " متصل الآن"; return; }
+    const last = o.reduce((a, b) => ((b.ts || 0) > (a.ts || 0) ? b : a));
+    el.textContent = last.ts ? "آخر ظهور " + last.name + ": " + lastSeenLabel(last.ts) : "";
+  }
+  function setPresence(online) {
+    if (!myName) return;
+    set(ref(db, "presence/" + keyOf(myName)), { name: myName, online, ts: serverTimestamp() }).catch(() => {});
+  }
+  let presenceStarted = false;
+  function initPresence() {
+    if (presenceStarted) return; presenceStarted = true;
+    onValue(ref(db, "presence"), (s) => { presence = s.val() || {}; renderPresence(); });
+    onValue(ref(db, ".info/connected"), (s) => {
+      if (s.val() !== true) return;
+      onDisconnect(ref(db, "presence/" + keyOf(myName)))
+        .set({ name: myName, online: false, ts: serverTimestamp() }).catch(() => {});
+      setPresence(!document.hidden);
+    });
+    document.addEventListener("visibilitychange", () => setPresence(!document.hidden));
+    setInterval(renderPresence, 3000);
+  }
+  let lastTypingSent = 0, typingStop;
+  function sendTyping() {
+    if (!myName) return;
+    const t = Date.now();
+    if (t - lastTypingSent > 2500) {
+      lastTypingSent = t;
+      set(ref(db, "typing/" + keyOf(myName)), { name: myName, ts: serverTimestamp() }).catch(() => {});
+    }
+    clearTimeout(typingStop);
+    typingStop = setTimeout(stopTyping, 3500);
+  }
+  function stopTyping() {
+    clearTimeout(typingStop); lastTypingSent = 0;
+    if (myName) remove(ref(db, "typing/" + keyOf(myName))).catch(() => {});
+  }
+  let typingStarted = false;
+  function initTyping() {
+    if (typingStarted) return; typingStarted = true;
+    onValue(ref(db, "typing"), (s) => { typingMap = s.val() || {}; renderPresence(); });
+  }
+
+  // --- البحث ---
+  const sBar = $("searchBar"), sIn = $("searchInput");
+  function applySearch() {
+    const q = sIn.value.trim().toLowerCase();
+    box.classList.toggle("searching", !!q);
+    let n = 0;
+    msgs.forEach((e) => {
+      const hit = !q || String(e.m.text || "").toLowerCase().includes(q);
+      e.div.classList.toggle("sr-hide", !hit);
+      if (q && hit) n++;
+    });
+    $("searchCount").textContent = q ? n + " نتيجة" : "";
+  }
+  function closeSearch() { sBar.classList.add("hidden"); sIn.value = ""; applySearch(); }
+  $("searchBtn").onclick = () => {
+    if (sBar.classList.contains("hidden")) { sBar.classList.remove("hidden"); sIn.focus(); }
+    else closeSearch();
+  };
+  $("searchClose").onclick = closeSearch;
+  sIn.addEventListener("input", applySearch);
+
+  // --- تثبيت رسالة ---
+  let pinned = null, pinStarted = false;
+  function renderPinned() {
+    const bar = $("pinBar");
+    if (!pinned) { bar.classList.add("hidden"); return; }
+    $("pinName").textContent = "📌 مثبّتة · " + (pinned.name || "");
+    $("pinText").textContent = pinned.text || "";
+    bar.classList.remove("hidden");
+  }
+  function initPinned() {
+    if (pinStarted) return; pinStarted = true;
+    onValue(ref(db, "pinned"), (s) => { pinned = s.val(); renderPinned(); });
+  }
+  function togglePin(key) {
+    const e = msgs.get(key); if (!e) return;
+    const op = (pinned && pinned.key === key)
+      ? remove(ref(db, "pinned"))
+      : set(ref(db, "pinned"), { key, name: e.m.name, text: snippetOf(e.m) });
+    op.catch((err) => alert("تعذّر التثبيت: " + (err.message || err)));
+  }
+  $("pinBar").onclick = () => { if (pinned) jumpTo(pinned.key); };
+  $("pinClose").onclick = (ev) => { ev.stopPropagation(); remove(ref(db, "pinned")).catch(() => {}); };
+  $("actPin").onclick = () => { const k = sheetKey; closeSheet(); if (k) togglePin(k); };
+
+  // --- تعديل رسالة ---
+  function editMessage(key) {
+    const e = msgs.get(key);
+    if (!e || e.m.name !== myName || !e.m.text) return;
+    const t = prompt("عدّل الرسالة:", e.m.text);
+    if (t === null) return;
+    const v = t.trim();
+    if (!v || v === e.m.text) return;
+    set(ref(db, "messages/" + key + "/text"), v)
+      .then(() => set(ref(db, "messages/" + key + "/edited"), true))
+      .then(() => { if (pinned && pinned.key === key) return set(ref(db, "pinned"), Object.assign({}, pinned, { text: v.slice(0, 80) })); })
+      .catch((err) => alert("تعذّر التعديل: " + (err.message || err)));
+  }
+  $("actEdit").onclick = () => { const k = sheetKey; closeSheet(); if (k) editMessage(k); };
+  function renderText(key) {
+    const e = msgs.get(key); if (!e) return;
+    if (e.textEl) { e.textEl.textContent = ""; e.textEl.appendChild(linkify(String(e.m.text || ""))); }
+    if (e.editedEl) e.editedEl.classList.toggle("hidden", !e.m.edited);
+    if (sIn.value.trim()) applySearch();
+  }
+
+  // --- الرسائل المختفية ---
+  const TTL_STEPS = [0, 3600, 86400, 604800];
+  const ttlName = (s) => (s === 0 ? "إيقاف" : s === 3600 ? "ساعة" : s === 86400 ? "24 ساعة" : "7 أيام");
+  let ttl = 0, ttlStarted = false;
+  function renderTtl() { $("ttlBtn").textContent = "⏳ الرسائل المختفية: " + ttlName(ttl); }
+  function initTtl() {
+    if (ttlStarted) return; ttlStarted = true;
+    onValue(ref(db, "settings/ttl"), (s) => { ttl = Number(s.val()) || 0; renderTtl(); });
+  }
+  $("ttlBtn").onclick = () => {
+    const next = TTL_STEPS[(TTL_STEPS.indexOf(ttl) + 1) % TTL_STEPS.length];
+    set(ref(db, "settings/ttl"), next)
+      .then(() => toast(next ? "الرسائل الجديدة تختفي بعد " + ttlName(next) : "تم إيقاف الرسائل المختفية", 3000))
+      .catch((err) => alert("تعذّر الحفظ: " + (err.message || err)));
+  };
+  function dropMessage(key, m) {
+    remove(ref(db, "messages/" + key)).catch(() => {});
+    if (m && m.mediaId) remove(ref(db, "media/" + m.mediaId)).catch(() => {});
+  }
+  function sweepExpired() {
+    const t = nowMs();
+    msgs.forEach((e, key) => { if (e.m.exp && t >= e.m.exp) dropMessage(key, e.m); });
+  }
+  let sweepStarted = false;
+  function startSweeper() {
+    if (sweepStarted) return; sweepStarted = true;
+    setInterval(sweepExpired, 15000);
+  }
 
   // ---------- استقبال الرسائل ----------
   const loadTime = Date.now();
@@ -912,6 +1146,7 @@
   }
 
   function addMessage(key, m) {
+    if (m.exp && nowMs() >= m.exp) { dropMessage(key, m); return; }   // رسالة منتهية: لا تُعرض
     if ($("empty")) $("empty").remove();
     const mine = m.name === myName;
     const wasBottom = isNearBottom();
@@ -940,9 +1175,10 @@
       div.appendChild(q);
     }
     if (m.mediaId) div.appendChild(makeMediaSlot(m));
+    let textEl = null;
     if (m.text) {
-      const t = document.createElement("div");
-      t.className = "text"; t.appendChild(linkify(String(m.text))); div.appendChild(t);
+      textEl = document.createElement("div");
+      textEl.className = "text"; textEl.appendChild(linkify(String(m.text))); div.appendChild(textEl);
     }
 
     const rxRow = document.createElement("div");
@@ -968,6 +1204,15 @@
       };
       meta.appendChild(del);
     }
+    const editedEl = document.createElement("span");
+    editedEl.className = "edited"; editedEl.textContent = "معدّلة";
+    editedEl.classList.toggle("hidden", !m.edited);
+    meta.appendChild(editedEl);
+    if (m.exp) {
+      const xp = document.createElement("span");
+      xp.className = "exp"; xp.textContent = "⏳"; xp.title = "تختفي تلقائيًا";
+      meta.appendChild(xp);
+    }
     const tm = document.createElement("span");
     tm.textContent = new Date(ts).toLocaleTimeString("fr-DZ", { hour: "2-digit", minute: "2-digit" });
     meta.appendChild(tm);
@@ -987,9 +1232,10 @@
 
     box.appendChild(div);
     nodes.set(key, div);
-    msgs.set(key, { div, m, tick, rxRow });
+    msgs.set(key, { div, m, tick, rxRow, textEl, editedEl });
     renderReactions(key);
     updateTicks();
+    if (sIn.value.trim()) applySearch();
 
     const isNew = m.ts && m.ts > loadTime + serverOffset - 3000;
     if (mine || wasBottom) scrollBottom(isNew);
@@ -1017,12 +1263,14 @@
       if (!e) return;
       e.m = snap.val();
       renderReactions(snap.key);
+      renderText(snap.key);
       updateTicks();
     });
     onChildRemoved(q, (snap) => {
       const el = nodes.get(snap.key);
       if (el) { el.remove(); nodes.delete(snap.key); }
       msgs.delete(snap.key);
+      if (pinned && pinned.key === snap.key) remove(ref(db, "pinned")).catch(() => {});
       if (nodes.size === 0) resetChat();
     });
     setTimeout(() => scrollBottom(false), 600);
@@ -1041,7 +1289,7 @@
     input.style.height = "auto";
     input.style.height = Math.min(input.scrollHeight, 120) + "px";
   }
-  input.addEventListener("input", autoGrow);
+  input.addEventListener("input", () => { autoGrow(); if (input.value.trim()) sendTyping(); });
   input.addEventListener("keydown", (e) => {
     if (e.key === "Enter" && !e.shiftKey && !/Mobi|Android|iPhone/i.test(navigator.userAgent)) {
       e.preventDefault(); $("form").requestSubmit();
@@ -1053,6 +1301,8 @@
     if (!text || !myName) return;
     const payload = { name: myName, text, ts: serverTimestamp() };
     if (replyTo) payload.reply = replyTo;
+    if (ttl) payload.exp = nowMs() + ttl * 1000;
+    stopTyping();
     push(messagesRef, payload).catch((err) => {
       alert("فشل الإرسال: " + err.message + "\n\nالسبب غالبًا قواعد Firebase (Règles) لا تسمح بالكتابة.");
       input.value = text; autoGrow();
