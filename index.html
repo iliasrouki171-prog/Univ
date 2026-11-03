@@ -6,12 +6,12 @@
 <meta name="theme-color" content="#1a0618">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-title" content="محادثتنا">
+<meta name="apple-mobile-web-app-title" content="عَالَمُنا">
 <meta name="apple-mobile-web-app-status-bar-style" content="black">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" type="image/png" href="icon-192.png">
 <link rel="apple-touch-icon" href="icon-192.png">
-<title>دردشة</title>
+<title>عَالَمُنا</title>
 <script>
   // شريط تشخيص: يعرض أي خطأ على الشاشة
   function showDiag(msg) {
@@ -22,7 +22,7 @@
       d.onclick = function () { d.remove(); };
       document.body.appendChild(d);
     }
-    d.textContent = msg + "  [v11 - اضغط لإغلاق]";
+    d.textContent = msg + "  [v12 - اضغط لإغلاق]";
   }
   // نلتقط حدث التثبيت مبكرًا قبل أن يبدأ باقي الكود
   window.addEventListener("beforeinstallprompt", function (e) {
@@ -370,7 +370,7 @@
 
 <header>
   <div class="hleft">
-    <div class="title"><span id="dot" title="حالة الاتصال"></span> 💞 محادثتنا <small style="opacity:.6;font-size:10px;font-weight:400">v11</small></div>
+    <div class="title"><span id="dot" title="حالة الاتصال"></span> عَالَمُنا <small style="opacity:.6;font-size:10px;font-weight:400">v12</small></div>
     <div id="presence" class="presence"></div>
   </div>
   <div class="right">
