@@ -6,6 +6,11 @@
 <meta name="theme-color" content="#1a0618">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="محادثتنا">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/png" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
 <title>دردشة</title>
 <script>
   // شريط تشخيص: يعرض أي خطأ على الشاشة
@@ -17,8 +22,12 @@
       d.onclick = function () { d.remove(); };
       document.body.appendChild(d);
     }
-    d.textContent = msg + "  [v9 - اضغط لإغلاق]";
+    d.textContent = msg + "  [v10 - اضغط لإغلاق]";
   }
+  // نلتقط حدث التثبيت مبكرًا قبل أن يبدأ باقي الكود
+  window.addEventListener("beforeinstallprompt", function (e) {
+    e.preventDefault(); window.__bip = e; window.dispatchEvent(new Event("bip-ready"));
+  });
   window.addEventListener("error", function (e) { showDiag("Error: " + (e.message || "script") + " (" + (e.lineno || "?") + ")"); });
   window.addEventListener("unhandledrejection", function (e) { showDiag("Promise: " + ((e.reason && e.reason.message) || e.reason)); });
   setTimeout(function () {
@@ -326,9 +335,10 @@
 </div>
 
 <header>
-  <div class="title"><span id="dot" title="حالة الاتصال"></span> 💞 محادثتنا <small style="opacity:.6;font-size:10px;font-weight:400">v9</small></div>
+  <div class="title"><span id="dot" title="حالة الاتصال"></span> 💞 محادثتنا <small style="opacity:.6;font-size:10px;font-weight:400">v10</small></div>
   <div class="right">
     <span id="who"></span>
+    <button class="icon-btn hidden" id="installBtn" title="تثبيت التطبيق">📲</button>
     <button class="icon-btn" id="soundBtn" title="الصوت">🔔</button>
     <button class="icon-btn" id="clearBtn" title="حذف المحادثة كاملة">🗑</button>
     <button class="icon-btn" id="logoutBtn" title="تسجيل الخروج">🚪</button>
@@ -425,6 +435,21 @@
       bg.appendChild(p);
     }
   })();
+
+  // ---------- تثبيت التطبيق (PWA) ----------
+  if ("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js").catch(() => {});
+  const showInstall = () => { if (window.__bip) $("installBtn").classList.remove("hidden"); };
+  showInstall();
+  window.addEventListener("bip-ready", showInstall);
+  window.addEventListener("appinstalled", () => {
+    window.__bip = null; $("installBtn").classList.add("hidden"); toast("تم تثبيت التطبيق 🎉");
+  });
+  $("installBtn").onclick = async () => {
+    const p = window.__bip; if (!p) return;
+    p.prompt();
+    try { await p.userChoice; } catch (e) {}
+    window.__bip = null; $("installBtn").classList.add("hidden");
+  };
 
   // ---------- الصوت ----------
   let soundOn = store.get("chat_sound", "1") === "1";
