@@ -22,7 +22,7 @@
       d.onclick = function () { d.remove(); };
       document.body.appendChild(d);
     }
-    d.textContent = msg + "  [v12 - اضغط لإغلاق]";
+    d.textContent = msg + "  [v13 - اضغط لإغلاق]";
   }
   // نلتقط حدث التثبيت مبكرًا قبل أن يبدأ باقي الكود
   window.addEventListener("beforeinstallprompt", function (e) {
@@ -345,6 +345,44 @@
   }
   @media (prefers-reduced-motion: reduce) { #bg, #bg * { animation: none !important; } }
   .hidden { display: none !important; }
+
+  /* ===== إضافات v13: المكالمات ===== */
+  #callUI {
+    position: fixed; inset: 0; z-index: 60; background: #000; color: #fff;
+    display: flex; flex-direction: column; align-items: center; justify-content: space-between;
+    padding: calc(40px + env(safe-area-inset-top)) 20px calc(40px + env(safe-area-inset-bottom));
+    overflow: hidden; text-align: center;
+  }
+  #callBg { position: absolute; inset: 0; z-index: -1; background: radial-gradient(circle at 50% 28%, #241a3d, #050308 72%); }
+  .call-status { font-size: 15px; color: #cfcfcf; letter-spacing: .3px; }
+  .call-mid { display: flex; flex-direction: column; align-items: center; gap: 8px; flex: 1; justify-content: center; width: 100%; position: relative; }
+  .call-avatar-ring { position: relative; width: 140px; height: 140px; display: flex; align-items: center; justify-content: center; margin-bottom: 4px; }
+  .call-avatar-ring::before, .call-avatar-ring::after {
+    content: ""; position: absolute; inset: 0; border-radius: 50%; border: 2px solid rgba(255,255,255,.25);
+    animation: ripple 2.2s ease-out infinite;
+  }
+  .call-avatar-ring::after { animation-delay: 1.1s; }
+  @keyframes ripple { 0% { transform: scale(1); opacity: .9; } 100% { transform: scale(1.8); opacity: 0; } }
+  .call-avatar {
+    width: 118px; height: 118px; border-radius: 50%; background: linear-gradient(145deg, #3a3a46, #1c1c24);
+    display: flex; align-items: center; justify-content: center; font-size: 54px; box-shadow: 0 6px 24px rgba(0,0,0,.5);
+  }
+  .call-name { font-size: 24px; font-weight: 600; }
+  .call-sub { color: #9a9a9a; font-size: 14px; }
+  #remoteVideo { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; background: #000; }
+  #localVideo {
+    position: absolute; bottom: 10px; inset-inline-end: 10px; width: 96px; height: 134px; object-fit: cover;
+    border-radius: 14px; border: 2px solid rgba(255,255,255,.3); background: #111; z-index: 2;
+  }
+  .call-actions { display: flex; gap: 34px; align-items: center; }
+  .call-btn { width: 64px; height: 64px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 25px; padding: 0; }
+  .call-btn.accept { background: #2fb344; animation: pulseGreen 1.4s ease-in-out infinite; }
+  .call-btn.decline, .call-btn.end { background: #e03131; }
+  .call-btn.decline { transform: rotate(135deg); }
+  .call-btn.decline span { display: inline-block; transform: rotate(-135deg); }
+  @keyframes pulseGreen { 0%,100% { box-shadow: 0 0 0 0 rgba(47,179,68,.6); } 50% { box-shadow: 0 0 0 14px rgba(47,179,68,0); } }
+  .call-ctrl { width: 50px; height: 50px; border-radius: 50%; background: rgba(255,255,255,.16); font-size: 19px; padding: 0; }
+  .call-ctrl.active-off { background: #e03131; }
 </style>
 </head>
 <body class="locked">
@@ -370,11 +408,13 @@
 
 <header>
   <div class="hleft">
-    <div class="title"><span id="dot" title="حالة الاتصال"></span> عَالَمُنا <small style="opacity:.6;font-size:10px;font-weight:400">v12</small></div>
+    <div class="title"><span id="dot" title="حالة الاتصال"></span> عَالَمُنا <small style="opacity:.6;font-size:10px;font-weight:400">v13</small></div>
     <div id="presence" class="presence"></div>
   </div>
   <div class="right">
     <span id="who"></span>
+    <button class="icon-btn" id="audioCallBtn" title="مكالمة صوتية">📞</button>
+    <button class="icon-btn" id="videoCallBtn" title="مكالمة فيديو">🎥</button>
     <button class="icon-btn" id="searchBtn" title="بحث">🔍</button>
     <button class="icon-btn" id="menuBtn" title="القائمة">⋮</button>
   </div>
@@ -435,6 +475,32 @@
       <button type="button" id="actPin">📌 تثبيت الرسالة</button>
       <button type="button" id="actEdit">✏️ تعديل</button>
     </div>
+  </div>
+</div>
+
+<div id="callUI" class="hidden">
+  <div id="callBg"></div>
+  <div class="call-top"><div class="call-status" id="callStatusText">اتصال وارد</div></div>
+  <div class="call-mid">
+    <video id="remoteVideo" autoplay playsinline class="hidden"></video>
+    <div class="call-avatar-ring" id="callAvatarRing"><div class="call-avatar">👤</div></div>
+    <div class="call-name" id="callName">مجهول</div>
+    <div class="call-sub" id="callSub">مكالمة صوتية</div>
+    <div class="call-sub hidden" id="callTimer">00:00</div>
+    <video id="localVideo" autoplay playsinline muted class="hidden"></video>
+  </div>
+  <div class="call-actions" id="callActionsIncoming">
+    <button type="button" class="call-btn decline" id="declineBtn" aria-label="رفض"><span>📞</span></button>
+    <button type="button" class="call-btn accept" id="acceptBtn" aria-label="قبول"><span>📞</span></button>
+  </div>
+  <div class="call-actions hidden" id="callActionsOutgoing">
+    <button type="button" class="call-btn decline" id="cancelCallBtn" aria-label="إلغاء"><span>📞</span></button>
+  </div>
+  <div class="call-actions hidden" id="callActionsActive">
+    <button type="button" class="call-ctrl" id="muteBtn" aria-label="كتم">🎙️</button>
+    <button type="button" class="call-ctrl hidden" id="camBtn" aria-label="الكاميرا">📷</button>
+    <button type="button" class="call-ctrl hidden" id="flipBtn" aria-label="تبديل الكاميرا">🔄</button>
+    <button type="button" class="call-btn end" id="endBtn" aria-label="إنهاء"><span>📞</span></button>
   </div>
 </div>
 
@@ -571,7 +637,7 @@
     $("login").classList.add("hidden");
     $("who").textContent = myName;
     listen();
-    initPresence(); initTyping(); initPinned(); initTtl(); startSweeper();
+    initPresence(); initTyping(); initPinned(); initTtl(); startSweeper(); initCalls();
   }
   $("enterBtn").onclick = tryLogin;
   $("codeInput").addEventListener("keydown", (e) => { if (e.key === "Enter") tryLogin(); });
@@ -1127,6 +1193,257 @@
     if (sweepStarted) return; sweepStarted = true;
     setInterval(sweepExpired, 15000);
   }
+
+  // ---------- المكالمات (صوت وفيديو) ----------
+  const webrtcSupported = () => !!(window.RTCPeerConnection && navigator.mediaDevices && navigator.mediaDevices.getUserMedia);
+  const iceConfig = () => ({ iceServers: [{ urls: ["stun:stun.l.google.com:19302", "stun:stun1.l.google.com:19302"] }] });
+
+  let callUnsub = null, callerCandUnsub = null, calleeCandUnsub = null;
+  let callState = "idle";   // idle | ringing-out | ringing-in | active
+  let pc = null, localStream = null, callDoc = null, isCaller = false, callStartTime = 0, currentFacing = "user";
+  let callTimerInterval = null, ringInterval = null, ringTimeoutHandle = null;
+  const pendingRemoteCandidates = [];
+  let seenCandidateKeys = new Set();
+
+  function postCallLog(text) {
+    if (!myName) return;
+    push(messagesRef, { name: myName, text, ts: serverTimestamp() }).catch(() => {});
+  }
+  function ringBeep(highFirst) {
+    try {
+      audioCtx = audioCtx || new (window.AudioContext || window.webkitAudioContext)();
+      [0, 170].forEach((d, i) => {
+        setTimeout(() => {
+          const o = audioCtx.createOscillator(), g = audioCtx.createGain();
+          o.type = "sine"; o.frequency.value = (i === 0) === !!highFirst ? 880 : 660;
+          g.gain.setValueAtTime(.18, audioCtx.currentTime);
+          g.gain.exponentialRampToValueAtTime(.001, audioCtx.currentTime + .3);
+          o.connect(g); g.connect(audioCtx.destination); o.start(); o.stop(audioCtx.currentTime + .3);
+        }, d);
+      });
+    } catch (e) {}
+  }
+  function ringStart(pattern) {
+    ringStop();
+    const tick = () => { ringBeep(true); if (navigator.vibrate) navigator.vibrate(pattern); };
+    tick(); ringInterval = setInterval(tick, 2000);
+  }
+  function ringStop() {
+    clearInterval(ringInterval); ringInterval = null;
+    if (navigator.vibrate) navigator.vibrate(0);
+  }
+
+  function showCallUI() { $("callUI").classList.remove("hidden"); }
+  function hideCallUI() { $("callUI").classList.add("hidden"); }
+  function setCallStage(stage, opts = {}) {
+    $("callActionsIncoming").classList.toggle("hidden", stage !== "in");
+    $("callActionsOutgoing").classList.toggle("hidden", stage !== "out");
+    $("callActionsActive").classList.toggle("hidden", stage !== "active");
+    $("callStatusText").textContent = stage === "in" ? "اتصال وارد" : stage === "out" ? "جارِ الاتصال..." : "متصل";
+    const showVideo = stage === "active" && opts.type === "video";
+    $("remoteVideo").classList.toggle("hidden", !showVideo);
+    $("localVideo").classList.toggle("hidden", !showVideo);
+    $("camBtn").classList.toggle("hidden", !(stage === "active" && opts.type === "video"));
+    $("flipBtn").classList.toggle("hidden", !(stage === "active" && opts.type === "video"));
+    $("callAvatarRing").classList.toggle("hidden", showVideo);
+    $("callName").classList.toggle("hidden", showVideo);
+    $("callSub").classList.toggle("hidden", stage === "active");
+    $("callTimer").classList.toggle("hidden", stage !== "active");
+  }
+
+  async function getCallMedia(type) {
+    return navigator.mediaDevices.getUserMedia({
+      audio: { echoCancellation: true, noiseSuppression: true },
+      video: type === "video" ? { facingMode: currentFacing, width: { ideal: 480 }, height: { ideal: 640 } } : false
+    });
+  }
+  function attachPC() {
+    pc = new RTCPeerConnection(iceConfig());
+    const remote = new MediaStream();
+    $("remoteVideo").srcObject = remote;
+    pc.ontrack = (e) => remote.addTrack(e.track);
+  }
+  function listenCandidates(childPath) {
+    const unsub = onChildAdded(ref(db, "call/" + childPath), (snap) => {
+      if (seenCandidateKeys.has(snap.key)) return;
+      seenCandidateKeys.add(snap.key);
+      const cand = snap.val();
+      if (!pc || !cand) return;
+      if (pc.remoteDescription && pc.remoteDescription.type) pc.addIceCandidate(new RTCIceCandidate(cand)).catch(() => {});
+      else pendingRemoteCandidates.push(cand);
+    });
+    if (childPath === "callerCandidates") callerCandUnsub = unsub; else calleeCandUnsub = unsub;
+  }
+  function flushPendingCandidates() {
+    while (pendingRemoteCandidates.length && pc) pc.addIceCandidate(new RTCIceCandidate(pendingRemoteCandidates.shift())).catch(() => {});
+  }
+
+  async function startCall(type) {
+    if (!webrtcSupported()) { alert("متصفحك لا يدعم المكالمات. افتح الرابط في Chrome."); return; }
+    if (callState !== "idle") return;
+    if (callDoc && ["ringing", "accepted"].includes(callDoc.status) && callDoc.from !== myName) { toast("الطرف الآخر مشغول حاليًا"); return; }
+    let stream;
+    try { stream = await getCallMedia(type); }
+    catch (e) { alert(type === "video" ? "تعذّر الوصول إلى الكاميرا أو الميكروفون." : "تعذّر الوصول إلى الميكروفون."); return; }
+    localStream = stream; $("localVideo").srcObject = stream;
+    isCaller = true; callState = "ringing-out";
+    attachPC();
+    stream.getTracks().forEach((t) => pc.addTrack(t, stream));
+    pc.onicecandidate = (e) => { if (e.candidate) push(ref(db, "call/callerCandidates"), e.candidate.toJSON()).catch(() => {}); };
+    const id = "c" + Date.now();
+    const offer = await pc.createOffer();
+    await pc.setLocalDescription(offer);
+    await set(ref(db, "call"), { id, from: myName, type, status: "ringing", offer: { type: offer.type, sdp: offer.sdp }, ts: nowMs() });
+    listenCandidates("calleeCandidates");
+    showCallUI(); setCallStage("out", { type });
+    $("callSub").textContent = type === "video" ? "مكالمة فيديو" : "مكالمة صوتية";
+    ringTimeoutHandle = setTimeout(() => {
+      if (callState === "ringing-out") { set(ref(db, "call/status"), "missed").catch(() => {}); postCallLog("📞 مكالمة فائتة"); cleanupCall(); }
+    }, 45000);
+  }
+
+  function showIncoming(c) {
+    callState = "ringing-in"; isCaller = false;
+    showCallUI(); setCallStage("in", { type: c.type });
+    $("callSub").textContent = c.type === "video" ? "مكالمة فيديو" : "مكالمة صوتية";
+    ringStart(c.type === "video" ? [500, 300, 500, 300, 500] : [500, 300, 500]);
+  }
+
+  async function acceptCall() {
+    const c = callDoc; if (!c || callState !== "ringing-in") return;
+    if (!webrtcSupported()) { alert("متصفحك لا يدعم المكالمات. افتح الرابط في Chrome."); declineCall(); return; }
+    ringStop();
+    let stream;
+    try { stream = await getCallMedia(c.type); }
+    catch (e) {
+      alert(c.type === "video" ? "تعذّر الوصول إلى الكاميرا أو الميكروفون." : "تعذّر الوصول إلى الميكروفون.");
+      declineCall(); return;
+    }
+    localStream = stream; $("localVideo").srcObject = stream;
+    attachPC();
+    stream.getTracks().forEach((t) => pc.addTrack(t, stream));
+    pc.onicecandidate = (e) => { if (e.candidate) push(ref(db, "call/calleeCandidates"), e.candidate.toJSON()).catch(() => {}); };
+    await pc.setRemoteDescription(new RTCSessionDescription(c.offer));
+    flushPendingCandidates();
+    listenCandidates("callerCandidates");
+    const answer = await pc.createAnswer();
+    await pc.setLocalDescription(answer);
+    await set(ref(db, "call/answer"), { type: answer.type, sdp: answer.sdp });
+    await set(ref(db, "call/status"), "accepted");
+    enterActive(c.type);
+  }
+
+  async function onAccepted(c) {
+    await pc.setRemoteDescription(new RTCSessionDescription(c.answer));
+    flushPendingCandidates();
+    enterActive(c.type);
+  }
+
+  function enterActive(type) {
+    callState = "active"; callStartTime = Date.now();
+    clearTimeout(ringTimeoutHandle);
+    setCallStage("active", { type });
+    $("callTimer").textContent = "00:00";
+    callTimerInterval = setInterval(() => {
+      const s = Math.floor((Date.now() - callStartTime) / 1000);
+      $("callTimer").textContent = Math.floor(s / 60) + ":" + String(s % 60).padStart(2, "0");
+    }, 1000);
+  }
+
+  function declineCall() {
+    if (callState !== "ringing-in") return;
+    ringStop();
+    set(ref(db, "call/status"), "declined").catch(() => {});
+    postCallLog("📞 مكالمة مرفوضة");
+    cleanupCall();
+  }
+  function cancelOutgoing() {
+    if (callState !== "ringing-out") return;
+    clearTimeout(ringTimeoutHandle);
+    set(ref(db, "call/status"), "ended").catch(() => {});
+    postCallLog("📞 تم إلغاء المكالمة");
+    cleanupCall();
+  }
+  function endCall() {
+    if (callState === "ringing-out") return cancelOutgoing();
+    if (callState === "ringing-in") return declineCall();
+    if (callState !== "active") return;
+    const secs = Math.max(0, Math.round((Date.now() - callStartTime) / 1000));
+    const mm = Math.floor(secs / 60), ss = String(secs % 60).padStart(2, "0");
+    const isVideo = callDoc && callDoc.type === "video";
+    set(ref(db, "call/status"), "ended").catch(() => {});
+    postCallLog((isVideo ? "🎥 مكالمة فيديو" : "📞 مكالمة صوتية") + " · " + mm + ":" + ss);
+    cleanupCall();
+  }
+
+  function cleanupCall() {
+    ringStop(); clearInterval(callTimerInterval); callTimerInterval = null; clearTimeout(ringTimeoutHandle);
+    if (callerCandUnsub) { callerCandUnsub(); callerCandUnsub = null; }
+    if (calleeCandUnsub) { calleeCandUnsub(); calleeCandUnsub = null; }
+    if (pc) { try { pc.close(); } catch (e) {} pc = null; }
+    if (localStream) { localStream.getTracks().forEach((t) => t.stop()); localStream = null; }
+    $("remoteVideo").srcObject = null; $("localVideo").srcObject = null;
+    $("muteBtn").textContent = "🎙️"; $("muteBtn").classList.remove("active-off");
+    $("camBtn").textContent = "📷"; $("camBtn").classList.remove("active-off");
+    pendingRemoteCandidates.length = 0; seenCandidateKeys = new Set();
+    callState = "idle"; isCaller = false;
+    hideCallUI();
+    setTimeout(() => { if (callState === "idle") remove(ref(db, "call")).catch(() => {}); }, 1500);
+  }
+
+  function initCalls() {
+    if (callUnsub) return;
+    callUnsub = onValue(ref(db, "call"), (snap) => {
+      callDoc = snap.val();
+      const c = callDoc;
+      if (!c) { if (callState !== "idle") cleanupCall(); return; }
+      if (c.status === "ringing" && c.from !== myName && callState === "idle") showIncoming(c);
+      else if (c.status === "accepted" && isCaller && callState === "ringing-out") onAccepted(c);
+      else if (c.status === "declined" && isCaller && callState === "ringing-out") { toast("تم رفض الاتصال"); cleanupCall(); }
+      else if (c.status === "missed" && !isCaller && callState === "ringing-in") cleanupCall();
+      else if (c.status === "ended" && callState !== "idle") {
+        if (callState === "active") toast("أنهى الطرف الآخر المكالمة");
+        cleanupCall();
+      }
+    });
+  }
+
+  $("audioCallBtn").onclick = () => startCall("audio");
+  $("videoCallBtn").onclick = () => startCall("video");
+  $("acceptBtn").onclick = acceptCall;
+  $("declineBtn").onclick = declineCall;
+  $("cancelCallBtn").onclick = cancelOutgoing;
+  $("endBtn").onclick = endCall;
+  $("muteBtn").onclick = () => {
+    if (!localStream) return;
+    const tracks = localStream.getAudioTracks();
+    const on = !(tracks[0] && tracks[0].enabled);
+    tracks.forEach((t) => (t.enabled = on));
+    $("muteBtn").textContent = on ? "🎙️" : "🔇";
+    $("muteBtn").classList.toggle("active-off", !on);
+  };
+  $("camBtn").onclick = () => {
+    if (!localStream) return;
+    const tracks = localStream.getVideoTracks();
+    const on = !(tracks[0] && tracks[0].enabled);
+    tracks.forEach((t) => (t.enabled = on));
+    $("camBtn").textContent = on ? "📷" : "🚫";
+    $("camBtn").classList.toggle("active-off", !on);
+  };
+  $("flipBtn").onclick = async () => {
+    if (!localStream || !pc) return;
+    currentFacing = currentFacing === "user" ? "environment" : "user";
+    try {
+      const ns = await navigator.mediaDevices.getUserMedia({ video: { facingMode: currentFacing, width: { ideal: 480 }, height: { ideal: 640 } } });
+      const newTrack = ns.getVideoTracks()[0];
+      const sender = pc.getSenders().find((s) => s.track && s.track.kind === "video");
+      if (sender) await sender.replaceTrack(newTrack);
+      const old = localStream.getVideoTracks()[0];
+      if (old) { localStream.removeTrack(old); old.stop(); }
+      localStream.addTrack(newTrack);
+      $("localVideo").srcObject = localStream;
+    } catch (e) { toast("تعذّر تبديل الكاميرا"); }
+  };
 
   // ---------- استقبال الرسائل ----------
   const loadTime = Date.now();
