@@ -1,6 +1,6 @@
 // Service worker: يجعل التطبيق قابلًا للتثبيت ويفتح حتى بدون إنترنت.
 // الاستراتيجية: الشبكة أولًا، فتصل التحديثات الجديدة فورًا، والنسخة المخزنة احتياطًا.
-const CACHE = "chat-v10";
+const CACHE = "chat-v11";
 const SHELL = ["./", "index.html", "manifest.webmanifest", "icon-192.png", "icon-512.png"];
 
 self.addEventListener("install", (e) => {

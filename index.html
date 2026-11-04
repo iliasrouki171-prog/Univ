@@ -22,7 +22,7 @@
       d.onclick = function () { d.remove(); };
       document.body.appendChild(d);
     }
-    d.textContent = msg + "  [v13 - اضغط لإغلاق]";
+    d.textContent = msg + "  [v14 - اضغط لإغلاق]";
   }
   // نلتقط حدث التثبيت مبكرًا قبل أن يبدأ باقي الكود
   window.addEventListener("beforeinstallprompt", function (e) {
@@ -383,6 +383,19 @@
   @keyframes pulseGreen { 0%,100% { box-shadow: 0 0 0 0 rgba(47,179,68,.6); } 50% { box-shadow: 0 0 0 14px rgba(47,179,68,0); } }
   .call-ctrl { width: 50px; height: 50px; border-radius: 50%; background: rgba(255,255,255,.16); font-size: 19px; padding: 0; }
   .call-ctrl.active-off { background: #e03131; }
+
+  /* ===== إضافات v14: أحتاج دقيقة + تذكيرات ===== */
+  #pauseBar {
+    display: flex; align-items: center; gap: 10px; padding: 10px 14px;
+    background: linear-gradient(120deg, rgba(40,60,110,.85), rgba(60,40,100,.85));
+    backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+    border-top: 1px solid rgba(160,190,255,.3); border-bottom: 1px solid rgba(160,190,255,.3);
+    font-size: 14px; color: #e4ecff;
+  }
+  #pauseBar .pb { flex: 1; min-width: 0; }
+  #pauseTimer { font-variant-numeric: tabular-nums; direction: ltr; font-weight: 600; }
+  #pauseBar button { background: rgba(255,255,255,.18); height: 32px; padding: 0 14px; font-size: 13px; border-radius: 16px; }
+  body.paused form { opacity: .5; pointer-events: none; }
 </style>
 </head>
 <body class="locked">
@@ -408,7 +421,7 @@
 
 <header>
   <div class="hleft">
-    <div class="title"><span id="dot" title="حالة الاتصال"></span> عَالَمُنا <small style="opacity:.6;font-size:10px;font-weight:400">v13</small></div>
+    <div class="title"><span id="dot" title="حالة الاتصال"></span> عَالَمُنا <small style="opacity:.6;font-size:10px;font-weight:400">v14</small></div>
     <div id="presence" class="presence"></div>
   </div>
   <div class="right">
@@ -436,6 +449,7 @@
     <button type="button" class="mi hidden" id="installBtn">📲 تثبيت التطبيق</button>
     <button type="button" class="mi" id="soundBtn">🔔 الصوت: مفعّل</button>
     <button type="button" class="mi" id="ttlBtn">⏳ الرسائل المختفية: إيقاف</button>
+    <button type="button" class="mi" id="pauseBtn">⏸️ أحتاج دقيقة</button>
     <button type="button" class="mi danger" id="clearBtn">🗑 حذف المحادثة كاملة</button>
     <button type="button" class="mi" id="logoutBtn">🚪 تسجيل الخروج</button>
   </div>
@@ -443,6 +457,11 @@
 
 <div id="messages"><div id="empty">لا توجد رسائل بعد، ابدأ المحادثة 💕</div></div>
 <button id="toBottom" class="hidden" aria-label="للأسفل">⬇<span id="badge" class="hidden">0</span></button>
+
+<div id="pauseBar" class="hidden">
+  <div class="pb">⏸️ <span id="pauseText">توقف مؤقت للتهدئة</span> · <span id="pauseTimer">10:00</span></div>
+  <button type="button" id="pauseCancel">إلغاء</button>
+</div>
 
 <div id="replyBar" class="hidden">
   <div class="rb"><div class="rn" id="replyName"></div><div class="rt" id="replyText"></div></div>
@@ -586,15 +605,21 @@
     if (soundOn) beep();
   };
   let audioCtx;
+  // نغمة خاصة بكما: ثلاث نغمات دافئة متصاعدة، مختلفة عن صوت التنبيه المعتاد في تطبيقات الدردشة
   function beep() {
     try {
       audioCtx = audioCtx || new (window.AudioContext || window.webkitAudioContext)();
-      const o = audioCtx.createOscillator(), g = audioCtx.createGain();
-      o.type = "sine"; o.frequency.value = 880;
-      g.gain.setValueAtTime(0.15, audioCtx.currentTime);
-      g.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.25);
-      o.connect(g); g.connect(audioCtx.destination);
-      o.start(); o.stop(audioCtx.currentTime + 0.25);
+      const t0 = audioCtx.currentTime;
+      [[0, 659.25, .12], [90, 783.99, .12], [190, 987.77, .22]].forEach(([delay, freq, dur]) => {
+        const o = audioCtx.createOscillator(), g = audioCtx.createGain();
+        o.type = "sine"; o.frequency.value = freq;
+        const start = t0 + delay / 1000;
+        g.gain.setValueAtTime(0.0001, start);
+        g.gain.exponentialRampToValueAtTime(0.16, start + 0.015);
+        g.gain.exponentialRampToValueAtTime(0.0001, start + dur);
+        o.connect(g); g.connect(audioCtx.destination);
+        o.start(start); o.stop(start + dur + 0.02);
+      });
     } catch (e) {}
   }
 
@@ -637,7 +662,7 @@
     $("login").classList.add("hidden");
     $("who").textContent = myName;
     listen();
-    initPresence(); initTyping(); initPinned(); initTtl(); startSweeper(); initCalls();
+    initPresence(); initTyping(); initPinned(); initTtl(); startSweeper(); initCalls(); initPause(); initMilestones();
   }
   $("enterBtn").onclick = tryLogin;
   $("codeInput").addEventListener("keydown", (e) => { if (e.key === "Enter") tryLogin(); });
@@ -1192,6 +1217,76 @@
   function startSweeper() {
     if (sweepStarted) return; sweepStarted = true;
     setInterval(sweepExpired, 15000);
+  }
+
+  // ---------- زر "أحتاج دقيقة" (توقف مؤقت متفق عليه عن الكتابة) ----------
+  const PAUSE_MIN = 10;
+  let pause = null, pauseStarted = false, pauseTick = null;
+  function renderPause() {
+    const active = pause && pause.until && nowMs() < pause.until;
+    document.body.classList.toggle("paused", !!active);
+    $("pauseBar").classList.toggle("hidden", !active);
+    clearInterval(pauseTick); pauseTick = null;
+    if (!active) { $("pauseBtn").textContent = "⏸️ أحتاج دقيقة"; return; }
+    $("pauseBtn").textContent = "▶️ إلغاء التوقف";
+    $("pauseText").textContent = (pause.by === myName ? "طلبت" : (pause.by || "") + " طلب/طلبت") + " توقفًا للتهدئة";
+    const tickFn = () => {
+      const left = Math.max(0, Math.round((pause.until - nowMs()) / 1000));
+      $("pauseTimer").textContent = Math.floor(left / 60) + ":" + String(left % 60).padStart(2, "0");
+      if (left <= 0) { clearInterval(pauseTick); pauseTick = null; remove(ref(db, "settings/pause")).catch(() => {}); }
+    };
+    tickFn(); pauseTick = setInterval(tickFn, 1000);
+  }
+  function initPause() {
+    if (pauseStarted) return; pauseStarted = true;
+    onValue(ref(db, "settings/pause"), (s) => { pause = s.val(); renderPause(); });
+  }
+  $("pauseBtn").onclick = () => {
+    const active = pause && pause.until && nowMs() < pause.until;
+    if (active) { remove(ref(db, "settings/pause")).catch(() => {}); toast("تم إلغاء التوقف"); return; }
+    set(ref(db, "settings/pause"), { by: myName, until: nowMs() + PAUSE_MIN * 60000 })
+      .then(() => toast("توقف مؤقت لمدة " + PAUSE_MIN + " دقائق للتهدئة 💙", 3000))
+      .catch((err) => alert("تعذّر الحفظ: " + (err.message || err)));
+  };
+  $("pauseCancel").onclick = () => remove(ref(db, "settings/pause")).catch(() => {});
+
+  // ---------- تذكيرات تلقائية بمناسبات صغيرة ----------
+  let startedAt = null, startAttempted = false, milestonesPosted = {}, milestonesLoaded = false;
+  const milestonePosting = new Set();   // حارس محلي يمنع إرسال نفس المناسبة مرتين من نفس الجهاز قبل اكتمال الحفظ
+  const DAY_MS = 86400000;
+  const MILESTONE_DAYS = [7, 30, 100, 200, 365, 500, 1000, 1500, 2000];
+  function initMilestones() {
+    onValue(ref(db, "settings/startedAt"), (s) => {
+      const v = s.val();
+      if (v) { startedAt = v; checkMilestones(); }
+      else if (!startAttempted) { startAttempted = true; set(ref(db, "settings/startedAt"), serverTimestamp()).catch(() => {}); }
+    });
+    // ننتظر أول قراءة فعلية لقائمة "المناسبات المرسلة سابقًا" قبل أي فحص،
+    // حتى لا نرسل مناسبة بُثّت بالفعل من جهاز آخر قبل أن نعلم بذلك (خصوصًا بعد إعادة تحميل الصفحة)
+    onValue(ref(db, "settings/milestonesPosted"), (s) => { milestonesPosted = s.val() || {}; milestonesLoaded = true; checkMilestones(); });
+    setInterval(checkMilestones, 60000);
+  }
+  function checkMilestones() {
+    if (!startedAt || !myName || !milestonesLoaded) return;
+    const days = Math.floor((nowMs() - startedAt) / DAY_MS);
+    MILESTONE_DAYS.forEach((d) => {
+      const key = "d" + d;
+      if (days !== d || milestonesPosted[key] || milestonePosting.has(key)) return;
+      postMilestone(key, "🎉 مرّ " + d + " يومًا على أول رسالة بينكما! 💕");
+    });
+    const started = new Date(startedAt), now = new Date(nowMs());
+    const years = now.getFullYear() - started.getFullYear();
+    if (years > 0 && now.getMonth() === started.getMonth() && now.getDate() === started.getDate()) {
+      const key = "y" + years;
+      if (!milestonesPosted[key] && !milestonePosting.has(key)) postMilestone(key, "🎂 سنة سعيدة! مرّت " + years + (years === 1 ? " سنة" : " سنوات") + " على بداية محادثتكما 🥳💖");
+    }
+  }
+  function postMilestone(key, text) {
+    if (milestonePosting.has(key)) return;
+    milestonePosting.add(key);
+    set(ref(db, "settings/milestonesPosted/" + key), true)
+      .then(() => push(messagesRef, { name: myName, text, ts: serverTimestamp() }))
+      .catch(() => { milestonePosting.delete(key); });
   }
 
   // ---------- المكالمات (صوت وفيديو) ----------
