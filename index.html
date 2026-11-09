@@ -396,6 +396,30 @@
   #pauseTimer { font-variant-numeric: tabular-nums; direction: ltr; font-weight: 600; }
   #pauseBar button { background: rgba(255,255,255,.18); height: 32px; padding: 0 14px; font-size: 13px; border-radius: 16px; }
   body.paused form { opacity: .5; pointer-events: none; }
+
+  /* ===== سلة المهملات (دردشة) ===== */
+  #trashPanel {
+    position: fixed; inset: 0; background: rgba(0,0,0,.55); z-index: 40;
+    display: flex; align-items: flex-end; justify-content: center;
+  }
+  #trashPanel .panel {
+    width: 100%; max-width: 480px; max-height: 78vh; display: flex; flex-direction: column;
+    background: #1c0f1e; border-radius: 20px 20px 0 0;
+    padding: 14px 14px calc(14px + env(safe-area-inset-bottom)); border-top: 1px solid rgba(255,143,184,.25);
+  }
+  .trash-head { display: flex; align-items: center; justify-content: space-between; font-size: 16px; font-weight: 600; margin-bottom: 4px; }
+  .trash-head button { background: none; font-size: 18px; padding: 4px 8px; }
+  .trash-note { color: var(--muted); font-size: 12px; margin-bottom: 8px; }
+  #trashList { overflow-y: auto; flex: 1; display: flex; flex-direction: column; gap: 8px; }
+  .trash-empty { color: var(--muted); text-align: center; padding: 30px 0; }
+  .trash-item { background: rgba(255,255,255,.06); border-radius: 12px; padding: 10px 12px; }
+  .trash-item .ti-name { color: var(--accent); font-size: 12px; font-weight: 600; }
+  .trash-item .ti-text { font-size: 14px; margin: 3px 0 2px; white-space: pre-wrap; word-break: break-word; }
+  .trash-item .ti-meta { color: var(--muted); font-size: 11px; }
+  .trash-item .ti-acts { display: flex; gap: 8px; margin-top: 8px; }
+  .trash-item .ti-acts button { flex: 1; border-radius: 10px; padding: 8px; font-size: 13px; background: rgba(255,255,255,.1); }
+  .trash-item .ti-acts button.restore { background: rgba(80,200,120,.25); color: #7ee6a0; }
+  .trash-item .ti-acts button.forever { background: rgba(255,92,92,.2); color: #ff8787; }
 </style>
 </head>
 <body class="locked">
@@ -450,6 +474,7 @@
     <button type="button" class="mi" id="soundBtn">🔔 الصوت: مفعّل</button>
     <button type="button" class="mi" id="ttlBtn">⏳ الرسائل المختفية: إيقاف</button>
     <button type="button" class="mi" id="pauseBtn">⏸️ أحتاج دقيقة</button>
+    <button type="button" class="mi" id="trashBtn">🗑️ دردشة</button>
     <button type="button" class="mi danger" id="clearBtn">🗑 حذف المحادثة كاملة</button>
     <button type="button" class="mi" id="logoutBtn">🚪 تسجيل الخروج</button>
   </div>
@@ -494,6 +519,18 @@
       <button type="button" id="actPin">📌 تثبيت الرسالة</button>
       <button type="button" id="actEdit">✏️ تعديل</button>
     </div>
+  </div>
+</div>
+
+<div id="trashPanel" class="hidden">
+  <div class="panel">
+    <div class="trash-head">
+      <span>🗑️ دردشة (سلة المهملات)</span>
+      <button type="button" id="trashClose">✕</button>
+    </div>
+    <div class="trash-note">الرسائل المحذوفة تبقى هنا 7 أيام قبل حذفها نهائيًا.</div>
+    <div id="trashList"></div>
+    <div id="trashEmpty" class="trash-empty hidden">لا توجد رسائل محذوفة</div>
   </div>
 </div>
 
