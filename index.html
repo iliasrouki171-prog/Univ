@@ -22,7 +22,7 @@
       d.onclick = function () { d.remove(); };
       document.body.appendChild(d);
     }
-    d.textContent = msg + "  [v14 - اضغط لإغلاق]";
+    d.textContent = msg + "  [v1 - اضغط لإغلاق]";
   }
   // نلتقط حدث التثبيت مبكرًا قبل أن يبدأ باقي الكود
   window.addEventListener("beforeinstallprompt", function (e) {
@@ -397,29 +397,28 @@
   #pauseBar button { background: rgba(255,255,255,.18); height: 32px; padding: 0 14px; font-size: 13px; border-radius: 16px; }
   body.paused form { opacity: .5; pointer-events: none; }
 
-  /* ===== سلة المهملات (دردشة) ===== */
+  /* ===== سلة المهملات "دردشة": تخرج كمحادثة منفصلة بشكلها الخاص ===== */
   #trashPanel {
-    position: fixed; inset: 0; background: rgba(0,0,0,.55); z-index: 40;
-    display: flex; align-items: flex-end; justify-content: center;
+    position: fixed; inset: 0; z-index: 55; background: var(--bg);
+    display: flex; flex-direction: column;
   }
-  #trashPanel .panel {
-    width: 100%; max-width: 480px; max-height: 78vh; display: flex; flex-direction: column;
-    background: #1c0f1e; border-radius: 20px 20px 0 0;
-    padding: 14px 14px calc(14px + env(safe-area-inset-bottom)); border-top: 1px solid rgba(255,143,184,.25);
+  #trashPanel .trash-header {
+    background: linear-gradient(120deg, rgba(70,60,20,.88), rgba(90,40,20,.88));
+    backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+    color: #fff; padding: 12px 16px; padding-top: calc(12px + env(safe-area-inset-top));
+    border-bottom: 1px solid rgba(255,255,255,.12);
   }
-  .trash-head { display: flex; align-items: center; justify-content: space-between; font-size: 16px; font-weight: 600; margin-bottom: 4px; }
-  .trash-head button { background: none; font-size: 18px; padding: 4px 8px; }
-  .trash-note { color: var(--muted); font-size: 12px; margin-bottom: 8px; }
-  #trashList { overflow-y: auto; flex: 1; display: flex; flex-direction: column; gap: 8px; }
-  .trash-empty { color: var(--muted); text-align: center; padding: 30px 0; }
-  .trash-item { background: rgba(255,255,255,.06); border-radius: 12px; padding: 10px 12px; }
-  .trash-item .ti-name { color: var(--accent); font-size: 12px; font-weight: 600; }
-  .trash-item .ti-text { font-size: 14px; margin: 3px 0 2px; white-space: pre-wrap; word-break: break-word; }
-  .trash-item .ti-meta { color: var(--muted); font-size: 11px; }
-  .trash-item .ti-acts { display: flex; gap: 8px; margin-top: 8px; }
-  .trash-item .ti-acts button { flex: 1; border-radius: 10px; padding: 8px; font-size: 13px; background: rgba(255,255,255,.1); }
-  .trash-item .ti-acts button.restore { background: rgba(80,200,120,.25); color: #7ee6a0; }
-  .trash-item .ti-acts button.forever { background: rgba(255,92,92,.2); color: #ff8787; }
+  #trashPanel .trash-header .title { display: flex; align-items: center; gap: 8px; font-size: 18px; font-weight: 600; }
+  #trashPanel .trash-header #trashClose { background: rgba(255,255,255,.16); }
+  #trashNote { font-size: 12px; }
+  #trashList { flex: 1; overflow-y: auto; padding: 12px; display: flex; flex-direction: column; gap: 6px; }
+  .trash-empty { color: var(--muted); text-align: center; margin: auto; font-size: 15px; }
+  .trash-item.msg .ti-acts { display: flex; gap: 8px; margin-top: 7px; direction: rtl; }
+  .trash-item.msg .ti-acts button {
+    flex: 1; border-radius: 10px; padding: 7px; font-size: 12px; background: rgba(255,255,255,.14); color: var(--text);
+  }
+  .trash-item.msg .ti-acts button.restore { background: rgba(80,200,120,.3); color: #9bf0b7; }
+  .trash-item.msg .ti-acts button.forever { background: rgba(255,92,92,.25); color: #ffabab; }
 </style>
 </head>
 <body class="locked">
@@ -445,7 +444,7 @@
 
 <header>
   <div class="hleft">
-    <div class="title"><span id="dot" title="حالة الاتصال"></span> عَالَمُنا <small style="opacity:.6;font-size:10px;font-weight:400">v14</small></div>
+    <div class="title"><span id="dot" title="حالة الاتصال"></span> عَالَمُنا <small style="opacity:.6;font-size:10px;font-weight:400">v1</small></div>
     <div id="presence" class="presence"></div>
   </div>
   <div class="right">
@@ -523,15 +522,14 @@
 </div>
 
 <div id="trashPanel" class="hidden">
-  <div class="panel">
-    <div class="trash-head">
-      <span>🗑️ دردشة (سلة المهملات)</span>
-      <button type="button" id="trashClose">✕</button>
+  <header class="trash-header">
+    <div class="hleft">
+      <div class="title"><button type="button" class="icon-btn" id="trashClose" aria-label="رجوع" title="رجوع">→</button> 🗑️ دردشة</div>
+      <div id="trashNote" class="presence">الرسائل المحذوفة تبقى هنا 7 أيام قبل حذفها نهائيًا</div>
     </div>
-    <div class="trash-note">الرسائل المحذوفة تبقى هنا 7 أيام قبل حذفها نهائيًا.</div>
-    <div id="trashList"></div>
-    <div id="trashEmpty" class="trash-empty hidden">لا توجد رسائل محذوفة</div>
-  </div>
+  </header>
+  <div id="trashList"></div>
+  <div id="trashEmpty" class="trash-empty hidden">لا توجد رسائل محذوفة هنا</div>
 </div>
 
 <div id="callUI" class="hidden">
@@ -699,7 +697,7 @@
     $("login").classList.add("hidden");
     $("who").textContent = myName;
     listen();
-    initPresence(); initTyping(); initPinned(); initTtl(); startSweeper(); initCalls(); initPause(); initMilestones();
+    initPresence(); initTyping(); initPinned(); initTtl(); startSweeper(); initCalls(); initPause(); initMilestones(); initTrash();
   }
   $("enterBtn").onclick = tryLogin;
   $("codeInput").addEventListener("keydown", (e) => { if (e.key === "Enter") tryLogin(); });
@@ -1081,12 +1079,16 @@
 
   // ---------- حذف المحادثة كاملة ----------
   $("clearBtn").onclick = async () => {
-    if (!confirm("هل تريد حذف المحادثة كاملة؟\nستُحذف كل الرسائل والصور والتسجيلات عند الطرفين.")) return;
-    if (!confirm("تأكيد أخير: لا يمكن التراجع عن الحذف.")) return;
+    if (!confirm("هل تريد حذف المحادثة كاملة؟\nستُنقل كل الرسائل إلى \"دردشة\" (سلة المهملات) عند الطرفين، وتقدرون استرجاعها خلال 7 أيام.")) return;
     try {
-      toast("جاري حذف المحادثة...", 0);
-      await Promise.all([remove(messagesRef), remove(ref(db, "media")), remove(ref(db, "pinned"))]);
-      hideToast(); toast("تم حذف المحادثة");
+      toast("جاري الحذف...", 0);
+      const writes = [];
+      msgs.forEach((e, key) => writes.push(
+        set(ref(db, "trash/" + key), Object.assign({}, e.m, { deletedAt: nowMs(), deletedBy: myName }))
+      ));
+      await Promise.all(writes);
+      await Promise.all([remove(messagesRef), remove(ref(db, "pinned"))]);
+      hideToast(); toast("تم نقل المحادثة إلى سلة المهملات");
     } catch (err) {
       hideToast();
       alert("تعذّر الحذف: " + (err.message || err));
@@ -1255,6 +1257,66 @@
     if (sweepStarted) return; sweepStarted = true;
     setInterval(sweepExpired, 15000);
   }
+
+  // ---------- سلة المهملات "دردشة": حذف الرسائل ينقلها هنا بدل حذفها نهائيًا ----------
+  const TRASH_DAYS = 7, TRASH_MS = TRASH_DAYS * 86400000;
+  let trash = {};
+  function trashMessage(key, m) {
+    const data = Object.assign({}, m, { deletedAt: nowMs(), deletedBy: myName });
+    set(ref(db, "trash/" + key), data).catch(() => {});
+    remove(ref(db, "messages/" + key)).catch(() => {});
+  }
+  function restoreMessage(key) {
+    const t = trash[key]; if (!t) return;
+    const data = Object.assign({}, t);
+    delete data.deletedAt; delete data.deletedBy;
+    set(ref(db, "messages/" + key), data)
+      .then(() => remove(ref(db, "trash/" + key)))
+      .then(() => toast("تم الاسترجاع"))
+      .catch((err) => alert("تعذّر الاسترجاع: " + (err.message || err)));
+  }
+  function purgeForever(key) {
+    const t = trash[key];
+    remove(ref(db, "trash/" + key)).catch(() => {});
+    if (t && t.mediaId) remove(ref(db, "media/" + t.mediaId)).catch(() => {});
+  }
+  function daysLeftLabel(deletedAt) {
+    const left = Math.max(0, Math.ceil((deletedAt + TRASH_MS - nowMs()) / 86400000));
+    return left <= 0 ? "سيُحذف نهائيًا قريبًا" : "يُحذف نهائيًا خلال " + left + (left === 1 ? " يوم" : " أيام");
+  }
+  function renderTrash() {
+    const list = $("trashList"); list.innerHTML = "";
+    // ترتيب زمني تصاعدي كأنها محادثة حقيقية (الأقدم أولًا)
+    const entries = Object.entries(trash).sort((a, b) => (a[1].deletedAt || 0) - (b[1].deletedAt || 0));
+    $("trashEmpty").classList.toggle("hidden", entries.length > 0);
+    entries.forEach(([key, t]) => {
+      const row = document.createElement("div");
+      row.className = "msg trash-item" + (t.name === myName ? " me" : "");
+      const nameEl = document.createElement("div"); nameEl.className = "name"; nameEl.textContent = t.name || "";
+      const textEl = document.createElement("div"); textEl.className = "text"; textEl.textContent = snippetOf(t) || "رسالة";
+      const metaEl = document.createElement("div"); metaEl.className = "edited";
+      metaEl.textContent = (t.deletedBy ? "حذفها " + t.deletedBy + " · " : "") + daysLeftLabel(t.deletedAt || nowMs());
+      const acts = document.createElement("div"); acts.className = "ti-acts";
+      const rb = document.createElement("button"); rb.type = "button"; rb.className = "restore"; rb.textContent = "↩️ استرجاع";
+      rb.onclick = () => restoreMessage(key);
+      const fb = document.createElement("button"); fb.type = "button"; fb.className = "forever"; fb.textContent = "🗑️ حذف نهائي";
+      fb.onclick = () => { if (confirm("حذف هذه الرسالة نهائيًا؟ لا يمكن التراجع.")) purgeForever(key); };
+      acts.appendChild(rb); acts.appendChild(fb);
+      row.appendChild(nameEl); row.appendChild(textEl); row.appendChild(metaEl); row.appendChild(acts);
+      list.appendChild(row);
+    });
+    list.scrollTop = list.scrollHeight;
+  }
+  let trashStarted = false;
+  function initTrash() {
+    if (trashStarted) return; trashStarted = true;
+    onValue(ref(db, "trash"), (s) => { trash = s.val() || {}; renderTrash(); });
+    setInterval(() => {
+      Object.entries(trash).forEach(([key, t]) => { if (t.deletedAt && nowMs() - t.deletedAt >= TRASH_MS) purgeForever(key); });
+    }, 60000);
+  }
+  $("trashBtn").onclick = () => { $("trashPanel").classList.remove("hidden"); renderTrash(); };
+  $("trashClose").onclick = () => $("trashPanel").classList.add("hidden");
 
   // ---------- زر "أحتاج دقيقة" (توقف مؤقت متفق عليه عن الكتابة) ----------
   const PAUSE_MIN = 10;
@@ -1647,9 +1709,8 @@
       const del = document.createElement("button");
       del.className = "del"; del.textContent = "🗑 حذف";
       del.onclick = () => {
-        if (!confirm("حذف هذه الرسالة؟")) return;
-        remove(ref(db, "messages/" + key));
-        if (m.mediaId) remove(ref(db, "media/" + m.mediaId));
+        if (!confirm("حذف هذه الرسالة؟ تقدر تسترجعها من \"دردشة\" (سلة المهملات) خلال 7 أيام.")) return;
+        trashMessage(key, m);
       };
       meta.appendChild(del);
     }
